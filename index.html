@@ -171,7 +171,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -180,6 +180,12 @@
           
         <span class="site-state-item-count">1</span>
         <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
 </div>
@@ -261,6 +267,166 @@
 <h2 id="2-2-左边第一个大于target的值"><a href="#2-2-左边第一个大于target的值" class="headerlink" title="2.2 左边第一个大于target的值"></a>2.2 左边第一个大于target的值</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">binarySearchLeft</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> middle = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">while</span> (left &lt;= right) &#123;</span><br><span class="line">            middle = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (nums[middle] &gt; target) &#123;</span><br><span class="line">                right = middle - <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                left = middle + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="comment">// 当所有的数字都小于等于target的时候，跳出循环的时候left=nums.length</span></span><br><span class="line">        <span class="keyword">if</span> (left &gt;= nums.length || nums[left] != target) &#123;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> left;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="2-3-有序数组中target的左右边界leetcode34-中等"><a href="#2-3-有序数组中target的左右边界leetcode34-中等" class="headerlink" title="2.3 有序数组中target的左右边界leetcode34(中等)"></a>2.3 有序数组中target的左右边界<a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array/">leetcode34(中等)</a></h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 解法1：遍历数组得到其左右边界，O(n)</span></span><br><span class="line">略</span><br><span class="line"><span class="comment">// 解法2：通过二分查找得到其左右边界</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">int</span>[] searchRange(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target) &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums.length==<span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[] &#123;-<span class="number">1</span>,-<span class="number">1</span>&#125;;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[] &#123; binarySearchLeft(nums, target), binarySearchRight(nums, target) &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">// 解法3：二分查找得到左边界，第一个大于target的位置-1即为右边界，那么就要找到第一个大于等于target的值的位置和第一个大于target的值的位置</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">int</span>[] searchRange(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target) &#123;</span><br><span class="line">		<span class="keyword">if</span>(nums.length==<span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;-<span class="number">1</span>,-<span class="number">1</span>&#125;;</span><br><span class="line">        <span class="keyword">int</span> leftIndex = binarySearch(nums, target, <span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">int</span> rightIndex = binarySearch(nums, target, <span class="keyword">false</span>) - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (leftIndex &gt;=<span class="number">0</span> &amp;&amp; rightIndex &lt; nums.length &amp;&amp; leftIndex &lt;= rightIndex &amp;&amp; nums[leftIndex] == target &amp;&amp; nums[rightIndex] == target) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;leftIndex, rightIndex&#125;;</span><br><span class="line">        &#125; </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;-<span class="number">1</span>, -<span class="number">1</span>&#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">binarySearch</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target, <span class="keyword">boolean</span> lower)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length - <span class="number">1</span>, ans = nums.length;</span><br><span class="line">        <span class="keyword">while</span> (left &lt;= right) &#123;</span><br><span class="line">            <span class="keyword">int</span> mid = (left + right) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (nums[mid] &gt; target || (lower &amp;&amp; nums[mid] &gt;= target)) &#123;</span><br><span class="line">                right = mid - <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                left = mid + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> left;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/16/Fabric-java-sdk/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="suki">
+      <meta itemprop="description" content="neither supercilious nor obsequious">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jjx">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/03/16/Fabric-java-sdk/" class="post-title-link" itemprop="url">Fabric-java-sdk</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-03-16 23:39:44" itemprop="dateCreated datePublished" datetime="2021-03-16T23:39:44+08:00">2021-03-16</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">Edited on</span>
+        <time title="Modified: 2021-09-18 00:19:06" itemprop="dateModified" datetime="2021-09-18T00:19:06+08:00">2021-09-18</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>获取channel对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 构建client</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建channel</span></span><br><span class="line"><span class="comment">// 1.</span></span><br><span class="line">client.newChannel()</span><br><span class="line">client.newChannel(String name) <span class="comment">// 只在client中创建一个channel对象，通常用于channel已在网络上存在的时候</span></span><br><span class="line">Peer peer = client.newPeer(<span class="string">&quot;peer1`&quot;</span>,<span class="string">&quot;grpc://127.0.0.1:7051&quot;</span>);</span><br><span class="line">channel.addPeer(peer);</span><br><span class="line">Orderer orderer = client.newOrderer(<span class="string">&quot;orderer1&quot;</span>,<span class="string">&quot;grpc://127.0.0.1:7050&quot;</span>);</span><br><span class="line">channel.addOrderer(orderer);</span><br><span class="line"><span class="comment">// 2.</span></span><br><span class="line">client.newChannel(String name, Orderer orderer, ChannelConfiguration channelConfiguration, <span class="keyword">byte</span>[]...)<span class="comment">// 向Orderer发送请求去创建channel</span></span><br><span class="line">    </span><br><span class="line">channel.initialize()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 查询交易</span></span><br><span class="line">TransactionInfo transactionInfo = channel.queryTransactionByID(<span class="string">&quot;&quot;</span>);</span><br><span class="line">Envelope envelope = transactionIndo.getTransactionEnvelope();</span><br><span class="line">ByteString byteString = envelope.getPayload()</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 通道对象已创建并且初始化，直接从client中获取，但必须先有上面的创建channel对象的步骤</span></span><br><span class="line">Channel channel = client.getChannel(<span class="string">&quot;name&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/16/Fabric-Event/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="suki">
+      <meta itemprop="description" content="neither supercilious nor obsequious">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jjx">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/03/16/Fabric-Event/" class="post-title-link" itemprop="url">Fabric Event</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-03-16 17:58:53" itemprop="dateCreated datePublished" datetime="2021-03-16T17:58:53+08:00">2021-03-16</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">Edited on</span>
+        <time title="Modified: 2021-09-18 00:18:36" itemprop="dateModified" datetime="2021-09-18T00:18:36+08:00">2021-09-18</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="存在意义"><a href="#存在意义" class="headerlink" title="存在意义"></a>存在意义</h2><p>应用和网络交互的一种方式，应该说是应用被动接收网络信息的一种方式，使用户感知到网络的变化</p>
+<p>应用主动与网络交互都是通过链码，包括系统链码用户链码</p>
+<h2 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h2><ul>
+<li>根据来源不同，分为用户链码发出的事件以及账本发出的事件，如下图所示</li>
+</ul>
+<p><img src="./Fabric-event/fabric-event.png" alt="fabric-event"></p>
+<ul>
+<li>根据事件类型的不同，分为<ul>
+<li>BlockEvent</li>
+<li>FilteredBlockEvent</li>
+<li>TransactionStatefulEvent</li>
+<li>ChaincodeEvent</li>
+</ul>
+</li>
+</ul>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2>
       
     </div>
 
