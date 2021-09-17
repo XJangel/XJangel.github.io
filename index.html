@@ -171,7 +171,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">7</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -213,6 +213,84 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/09/18/go-advanced/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="suki">
+      <meta itemprop="description" content="neither supercilious nor obsequious">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jjx">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/09/18/go-advanced/" class="post-title-link" itemprop="url">go advanced</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2021-09-18 00:28:59 / Modified: 00:39:41" itemprop="dateCreated datePublished" datetime="2021-09-18T00:28:59+08:00">2021-09-18</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="go"><a href="#go" class="headerlink" title="go"></a>go</h1><h1 id="一、基础知识"><a href="#一、基础知识" class="headerlink" title="一、基础知识"></a>一、基础知识</h1><h2 id="1-1-数据结构"><a href="#1-1-数据结构" class="headerlink" title="1.1 数据结构"></a>1.1 数据结构</h2><h3 id="1-1-1-slice"><a href="#1-1-1-slice" class="headerlink" title="1.1.1 slice"></a>1.1.1 slice</h3><h2 id="1-2-channel"><a href="#1-2-channel" class="headerlink" title="1.2 channel"></a>1.2 channel</h2><p>GO中的channel分为有缓存的channel以及无缓存channel，channel的出现是为了用于不同协程之间的通信</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">channel <span class="keyword">chan</span> <span class="keyword">string</span></span><br><span class="line">channel=<span class="built_in">make</span>(<span class="keyword">string</span>,&lt;size&gt;)</span><br></pre></td></tr></table></figure>
+
+<p>对于channel的消费模型，可以分为以下几种：</p>
+<ul>
+<li>一写一读</li>
+<li>一写多读</li>
+<li>多读一写</li>
+<li>多读多写</li>
+</ul>
+<p>经典使用场景：</p>
+<p>（1）程序退出时，停掉其他goroutine，避免内存泄漏</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 相关groutine会有以下判断，此时应通过close()来通知其他goroutine而不是通过向exitChan中发送真正的数据，如struct&#123;&#125;&#123;&#125;。原因在于若发送真正的数据，由于有多个消费者，那么要发送相应数量的数据才能让每个gorouine获取到数据，执行退出。而close()执行之后每个消费者都能获取到一个数据，后者实现相对简单优雅。</span></span><br><span class="line"><span class="keyword">for</span>&#123;</span><br><span class="line">    <span class="keyword">select</span>&#123;</span><br><span class="line">        <span class="keyword">case</span> _ = &lt;- exitChan:</span><br><span class="line">        	........</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
