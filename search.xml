@@ -19,8 +19,11 @@
 </li>
 </ul>
 <h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2>]]></content>
+      <categories>
+        <category>Fabric</category>
+      </categories>
       <tags>
-        <tag>Fabric</tag>
+        <tag>Fabric BlockChain</tag>
       </tags>
   </entry>
   <entry>
@@ -33,11 +36,23 @@
 <h2 id="2-2-左边第一个大于target的值"><a href="#2-2-左边第一个大于target的值" class="headerlink" title="2.2 左边第一个大于target的值"></a>2.2 左边第一个大于target的值</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">binarySearchLeft</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> middle = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">while</span> (left &lt;= right) &#123;</span><br><span class="line">            middle = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (nums[middle] &gt; target) &#123;</span><br><span class="line">                right = middle - <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                left = middle + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="comment">// 当所有的数字都小于等于target的时候，跳出循环的时候left=nums.length</span></span><br><span class="line">        <span class="keyword">if</span> (left &gt;= nums.length || nums[left] != target) &#123;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> left;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="2-3-有序数组中target的左右边界leetcode34-中等"><a href="#2-3-有序数组中target的左右边界leetcode34-中等" class="headerlink" title="2.3 有序数组中target的左右边界leetcode34(中等)"></a>2.3 有序数组中target的左右边界<a href="https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array/">leetcode34(中等)</a></h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 解法1：遍历数组得到其左右边界，O(n)</span></span><br><span class="line">略</span><br><span class="line"><span class="comment">// 解法2：通过二分查找得到其左右边界</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">int</span>[] searchRange(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target) &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums.length==<span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[] &#123;-<span class="number">1</span>,-<span class="number">1</span>&#125;;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[] &#123; binarySearchLeft(nums, target), binarySearchRight(nums, target) &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">// 解法3：二分查找得到左边界，第一个大于target的位置-1即为右边界，那么就要找到第一个大于等于target的值的位置和第一个大于target的值的位置</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">int</span>[] searchRange(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target) &#123;</span><br><span class="line">		<span class="keyword">if</span>(nums.length==<span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;-<span class="number">1</span>,-<span class="number">1</span>&#125;;</span><br><span class="line">        <span class="keyword">int</span> leftIndex = binarySearch(nums, target, <span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">int</span> rightIndex = binarySearch(nums, target, <span class="keyword">false</span>) - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (leftIndex &gt;=<span class="number">0</span> &amp;&amp; rightIndex &lt; nums.length &amp;&amp; leftIndex &lt;= rightIndex &amp;&amp; nums[leftIndex] == target &amp;&amp; nums[rightIndex] == target) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;leftIndex, rightIndex&#125;;</span><br><span class="line">        &#125; </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;-<span class="number">1</span>, -<span class="number">1</span>&#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">binarySearch</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target, <span class="keyword">boolean</span> lower)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length - <span class="number">1</span>, ans = nums.length;</span><br><span class="line">        <span class="keyword">while</span> (left &lt;= right) &#123;</span><br><span class="line">            <span class="keyword">int</span> mid = (left + right) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (nums[mid] &gt; target || (lower &amp;&amp; nums[mid] &gt;= target)) &#123;</span><br><span class="line">                right = mid - <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                left = mid + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> left;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Algorithm</category>
+      </categories>
+      <tags>
+        <tag>Algorithm BinarySearch</tag>
+      </tags>
   </entry>
   <entry>
     <title>Fabric configtx.yaml详解</title>
     <url>/2021/03/11/Fabric-configtx-yaml%E8%AF%A6%E8%A7%A3/</url>
     <content><![CDATA[]]></content>
+      <categories>
+        <category>Fabric</category>
+      </categories>
+      <tags>
+        <tag>Fabric BlockChain</tag>
+      </tags>
   </entry>
   <entry>
     <title>Fabric-java-sdk</title>
@@ -48,8 +63,11 @@
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 通道对象已创建并且初始化，直接从client中获取，但必须先有上面的创建channel对象的步骤</span></span><br><span class="line">Channel channel = client.getChannel(<span class="string">&quot;name&quot;</span>)</span><br></pre></td></tr></table></figure>
 
 ]]></content>
+      <categories>
+        <category>Fabric</category>
+      </categories>
       <tags>
-        <tag>Fabric</tag>
+        <tag>Fabric BlockChain</tag>
       </tags>
   </entry>
   <entry>
@@ -70,6 +88,12 @@
 <figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 相关groutine会有以下判断，此时应通过close()来通知其他goroutine而不是通过向exitChan中发送真正的数据，如struct&#123;&#125;&#123;&#125;。原因在于若发送真正的数据，由于有多个消费者，那么要发送相应数量的数据才能让每个gorouine获取到数据，执行退出。而close()执行之后每个消费者都能获取到一个数据，后者实现相对简单优雅。</span></span><br><span class="line"><span class="keyword">for</span>&#123;</span><br><span class="line">    <span class="keyword">select</span>&#123;</span><br><span class="line">        <span class="keyword">case</span> _ = &lt;- exitChan:</span><br><span class="line">        	........</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 ]]></content>
+      <categories>
+        <category>Go</category>
+      </categories>
+      <tags>
+        <tag>Go</tag>
+      </tags>
   </entry>
   <entry>
     <title>Hello World</title>
@@ -96,8 +120,11 @@
 <p>vault server启动之后处于seal(密封)状态，此时只能unseal，其他什么都做不了。</p>
 ]]></content>
       <categories>
-        <category>安全</category>
+        <category>Security</category>
       </categories>
+      <tags>
+        <tag>Security Secret-Management</tag>
+      </tags>
   </entry>
   <entry>
     <title>http</title>
