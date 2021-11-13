@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>Fabric Event</title>
+    <url>/2021/03/16/Fabric-Event/</url>
+    <content><![CDATA[<h2 id="存在意义"><a href="#存在意义" class="headerlink" title="存在意义"></a>存在意义</h2><p>应用和网络交互的一种方式，应该说是应用被动接收网络信息的一种方式，使用户感知到网络的变化</p>
+<p>应用主动与网络交互都是通过链码，包括系统链码用户链码</p>
+<h2 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h2><ul>
+<li>根据来源不同，分为用户链码发出的事件以及账本发出的事件，如下图所示</li>
+</ul>
+<p><img src="./Fabric-event/fabric-event.png" alt="fabric-event"></p>
+<ul>
+<li>根据事件类型的不同，分为<ul>
+<li>BlockEvent</li>
+<li>FilteredBlockEvent</li>
+<li>TransactionStatefulEvent</li>
+<li>ChaincodeEvent</li>
+</ul>
+</li>
+</ul>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2>]]></content>
+      <tags>
+        <tag>Fabric</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Binary Search</title>
+    <url>/2021/08/15/Binary-Search/</url>
+    <content><![CDATA[<h1 id="1-经典二分查找"><a href="#1-经典二分查找" class="headerlink" title="1.经典二分查找"></a>1.经典二分查找</h1><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 数组为有序数组，且不存在重复数字，若找不到目标数字则返回-1。</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">binarySearch</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(nums.length == <span class="number">0</span>) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length -<span class="number">1</span>, middle = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>(left &lt;= right)&#123;</span><br><span class="line">        middle = left + (right - left) / <span class="number">2</span>;  <span class="comment">//防止left+right可能导致的数字溢出，因此采用此种方式</span></span><br><span class="line">        <span class="keyword">if</span>(nums[middle] == target)&#123;</span><br><span class="line">            <span class="keyword">return</span> middle;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span>(nums[middle] &gt; target)&#123;</span><br><span class="line">            right = middle - <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span>&#123;</span><br><span class="line">            left = middle + <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-二分查找进化版"><a href="#2-二分查找进化版" class="headerlink" title="2. 二分查找进化版"></a>2. 二分查找进化版</h1><h2 id="2-1-寻找target的左-右边界"><a href="#2-1-寻找target的左-右边界" class="headerlink" title="2.1 寻找target的左/右边界"></a>2.1 寻找target的左/右边界</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 左边界即寻找最左边的等于target的数字的位置</span></span><br><span class="line"><span class="comment">// 如[1,2,2,4,6] target=2 则应返回位置1</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">binarySearchLeft</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> middle = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">while</span> (left &lt;= right) &#123;</span><br><span class="line">            middle = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">            <span class="comment">// 注意等于时的情况，right等于middle-1，往左边界逼近。最后退出循环时left=right+1，刚好为左边界</span></span><br><span class="line">            <span class="comment">// 另一种想法，循环条件为left&lt;right，当nums[middle]==target时，right=middle以保住不遗漏掉左边界，对于左边界而言此方法可行</span></span><br><span class="line">            <span class="keyword">if</span> (nums[middle] &gt;= target) &#123; </span><br><span class="line">                right = middle - <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                left = middle + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="comment">// 当所有的数字都小于target的时候，跳出循环的时候left=nums.length</span></span><br><span class="line">        <span class="keyword">if</span> (left &gt;= nums.length || nums[left] != target) &#123;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> left;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 右边界</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">binarySearchRight</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length-<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> middle = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">     <span class="comment">// 另一种想法，循环条件为left&lt;right，当nums[middle]==target时，left=middle以保住不遗漏掉左边界，对于右边界而言此方法不可行。当nums[left]与nums[right]皆等于target时，middle计算的值为left，若left=middle，也就是left=left，陷入死循环</span></span><br><span class="line">        <span class="keyword">while</span> (left &lt;= right) &#123;</span><br><span class="line">            middle = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (nums[middle] &gt; target) &#123;</span><br><span class="line">                right = middle - <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                left = middle + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="comment">// 当所有的数字都大于target的时候，跳出循环时right=-1</span></span><br><span class="line">        <span class="keyword">if</span>(right &lt; <span class="number">0</span> || nums[right] != target) &#123;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> right;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">// 有边界解法2：</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">binarySearchRight</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 为了保证右边界永远指向大于target的数值，否则假如一开始right指向的值等于target，那么循环退出left=right的时候，left指向的正好为右边界，与一开始right指向为大于target的值的情况冲突，因此将right设为nums.length</span></span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length; </span><br><span class="line">        <span class="keyword">int</span> middle = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">while</span> (left &lt; right) &#123;</span><br><span class="line">            middle = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (nums[middle] &gt; target) &#123;</span><br><span class="line">                right = middle;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                left = middle + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(left&lt;<span class="number">1</span>||nums[left-<span class="number">1</span>]!=target) &#123;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> left-<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2-左边第一个大于target的值"><a href="#2-2-左边第一个大于target的值" class="headerlink" title="2.2 左边第一个大于target的值"></a>2.2 左边第一个大于target的值</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">binarySearchLeft</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> middle = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">while</span> (left &lt;= right) &#123;</span><br><span class="line">            middle = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (nums[middle] &gt; target) &#123;</span><br><span class="line">                right = middle - <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                left = middle + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="comment">// 当所有的数字都小于等于target的时候，跳出循环的时候left=nums.length</span></span><br><span class="line">        <span class="keyword">if</span> (left &gt;= nums.length || nums[left] != target) &#123;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> left;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3-有序数组中target的左右边界leetcode34-中等"><a href="#2-3-有序数组中target的左右边界leetcode34-中等" class="headerlink" title="2.3 有序数组中target的左右边界leetcode34(中等)"></a>2.3 有序数组中target的左右边界<a href="https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array/">leetcode34(中等)</a></h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 解法1：遍历数组得到其左右边界，O(n)</span></span><br><span class="line">略</span><br><span class="line"><span class="comment">// 解法2：通过二分查找得到其左右边界</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">int</span>[] searchRange(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target) &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums.length==<span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[] &#123;-<span class="number">1</span>,-<span class="number">1</span>&#125;;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[] &#123; binarySearchLeft(nums, target), binarySearchRight(nums, target) &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">// 解法3：二分查找得到左边界，第一个大于target的位置-1即为右边界，那么就要找到第一个大于等于target的值的位置和第一个大于target的值的位置</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">int</span>[] searchRange(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target) &#123;</span><br><span class="line">		<span class="keyword">if</span>(nums.length==<span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;-<span class="number">1</span>,-<span class="number">1</span>&#125;;</span><br><span class="line">        <span class="keyword">int</span> leftIndex = binarySearch(nums, target, <span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">int</span> rightIndex = binarySearch(nums, target, <span class="keyword">false</span>) - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (leftIndex &gt;=<span class="number">0</span> &amp;&amp; rightIndex &lt; nums.length &amp;&amp; leftIndex &lt;= rightIndex &amp;&amp; nums[leftIndex] == target &amp;&amp; nums[rightIndex] == target) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;leftIndex, rightIndex&#125;;</span><br><span class="line">        &#125; </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;-<span class="number">1</span>, -<span class="number">1</span>&#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">binarySearch</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target, <span class="keyword">boolean</span> lower)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length - <span class="number">1</span>, ans = nums.length;</span><br><span class="line">        <span class="keyword">while</span> (left &lt;= right) &#123;</span><br><span class="line">            <span class="keyword">int</span> mid = (left + right) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (nums[mid] &gt; target || (lower &amp;&amp; nums[mid] &gt;= target)) &#123;</span><br><span class="line">                right = mid - <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                left = mid + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> left;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>]]></content>
+  </entry>
+  <entry>
+    <title>Fabric configtx.yaml详解</title>
+    <url>/2021/03/11/Fabric-configtx-yaml%E8%AF%A6%E8%A7%A3/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>Fabric-java-sdk</title>
+    <url>/2021/03/16/Fabric-java-sdk/</url>
+    <content><![CDATA[<p>获取channel对象</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 构建client</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建channel</span></span><br><span class="line"><span class="comment">// 1.</span></span><br><span class="line">client.newChannel()</span><br><span class="line">client.newChannel(String name) <span class="comment">// 只在client中创建一个channel对象，通常用于channel已在网络上存在的时候</span></span><br><span class="line">Peer peer = client.newPeer(<span class="string">&quot;peer1`&quot;</span>,<span class="string">&quot;grpc://127.0.0.1:7051&quot;</span>);</span><br><span class="line">channel.addPeer(peer);</span><br><span class="line">Orderer orderer = client.newOrderer(<span class="string">&quot;orderer1&quot;</span>,<span class="string">&quot;grpc://127.0.0.1:7050&quot;</span>);</span><br><span class="line">channel.addOrderer(orderer);</span><br><span class="line"><span class="comment">// 2.</span></span><br><span class="line">client.newChannel(String name, Orderer orderer, ChannelConfiguration channelConfiguration, <span class="keyword">byte</span>[]...)<span class="comment">// 向Orderer发送请求去创建channel</span></span><br><span class="line">    </span><br><span class="line">channel.initialize()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 查询交易</span></span><br><span class="line">TransactionInfo transactionInfo = channel.queryTransactionByID(<span class="string">&quot;&quot;</span>);</span><br><span class="line">Envelope envelope = transactionIndo.getTransactionEnvelope();</span><br><span class="line">ByteString byteString = envelope.getPayload()</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 通道对象已创建并且初始化，直接从client中获取，但必须先有上面的创建channel对象的步骤</span></span><br><span class="line">Channel channel = client.getChannel(<span class="string">&quot;name&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>Fabric</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>go advanced</title>
+    <url>/2021/09/18/go-advanced/</url>
+    <content><![CDATA[<h1 id="go"><a href="#go" class="headerlink" title="go"></a>go</h1><h1 id="一、基础知识"><a href="#一、基础知识" class="headerlink" title="一、基础知识"></a>一、基础知识</h1><h2 id="1-1-数据结构"><a href="#1-1-数据结构" class="headerlink" title="1.1 数据结构"></a>1.1 数据结构</h2><h3 id="1-1-1-slice"><a href="#1-1-1-slice" class="headerlink" title="1.1.1 slice"></a>1.1.1 slice</h3><h2 id="1-2-channel"><a href="#1-2-channel" class="headerlink" title="1.2 channel"></a>1.2 channel</h2><p>GO中的channel分为有缓存的channel以及无缓存channel，channel的出现是为了用于不同协程之间的通信</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">channel <span class="keyword">chan</span> <span class="keyword">string</span></span><br><span class="line">channel=<span class="built_in">make</span>(<span class="keyword">string</span>,&lt;size&gt;)</span><br></pre></td></tr></table></figure>
+
+<p>对于channel的消费模型，可以分为以下几种：</p>
+<ul>
+<li>一写一读</li>
+<li>一写多读</li>
+<li>多读一写</li>
+<li>多读多写</li>
+</ul>
+<p>经典使用场景：</p>
+<p>（1）程序退出时，停掉其他goroutine，避免内存泄漏</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 相关groutine会有以下判断，此时应通过close()来通知其他goroutine而不是通过向exitChan中发送真正的数据，如struct&#123;&#125;&#123;&#125;。原因在于若发送真正的数据，由于有多个消费者，那么要发送相应数量的数据才能让每个gorouine获取到数据，执行退出。而close()执行之后每个消费者都能获取到一个数据，后者实现相对简单优雅。</span></span><br><span class="line"><span class="keyword">for</span>&#123;</span><br><span class="line">    <span class="keyword">select</span>&#123;</span><br><span class="line">        <span class="keyword">case</span> _ = &lt;- exitChan:</span><br><span class="line">        	........</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2021/03/08/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>vault</title>
+    <url>/2021/03/11/vault/</url>
+    <content><![CDATA[<p><a href="https://www.vaultproject.io/docs">Vault</a>是密钥管理，加密即服务和特权访问管理的工具，其<a href="https://github.com/hashicorp/vault">开源代码</a>托管在github。</p>
+<p>vault server启动之后处于seal(密封)状态，此时只能unseal，其他什么都做不了。</p>
+]]></content>
+      <categories>
+        <category>安全</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>http</title>
+    <url>/2021/09/24/http/</url>
+    <content><![CDATA[<h1 id="http-1-0"><a href="#http-1-0" class="headerlink" title="http 1.0"></a>http 1.0</h1><h2 id="1-基本特征"><a href="#1-基本特征" class="headerlink" title="1. 基本特征"></a>1. 基本特征</h2><p>无状态 无连接的应用层协议</p>
+<p>client每次请求都要和server建立一个TCP连接，server处理完成后哦立即断开连接，也就是一来一回一次通信，一请求一回答</p>
+<p>那么存在的问题就是server无法主动发送消息给client，每次建立TCP连接也都要花费一定时间</p>
+<p>由于http 1.0规定收到response才能发起下一个request，因此若一直未收到某response，那么将会阻塞其余的request</p>
+<h2 id="2-报文结构"><a href="#2-报文结构" class="headerlink" title="2. 报文结构"></a>2. 报文结构</h2><h3 id="2-1-请求报文"><a href="#2-1-请求报文" class="headerlink" title="2.1 请求报文"></a>2.1 请求报文</h3><h4 id="2-1-1-报文格式"><a href="#2-1-1-报文格式" class="headerlink" title="2.1.1 报文格式"></a>2.1.1 报文格式</h4><p>client—&gt;server   报文的所有字段都是ASCII码</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">[方法][ ][URL][ ][版本][CRLF]          <span class="comment">// 请求头，如 GET /index.html http/1.0</span></span><br><span class="line">[首部字段名][:][ ][首部字段值][CRLF]     <span class="comment">// 首部行，说明client/server/报文主体信息</span></span><br><span class="line">[首部字段名][:][ ][首部字段值][CRLF]</span><br><span class="line">……</span><br><span class="line">[CRLF]</span><br><span class="line">[请求内容]</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-1-2-请求方法"><a href="#2-1-2-请求方法" class="headerlink" title="2.1.2 请求方法"></a>2.1.2 请求方法</h4><p>http1.0中只有get post head三种</p>
+<h4 id="2-1-3-首部字段"><a href="#2-1-3-首部字段" class="headerlink" title="2.1.3 首部字段"></a>2.1.3 首部字段</h4><table>
+<thead>
+<tr>
+<th>头（header）</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>User- Agent</td>
+<td>关于浏览器和它平台的信息，如Moilla5.0</td>
+</tr>
+<tr>
+<td>Accept</td>
+<td>客户能处理的页面的类型，如text/html</td>
+</tr>
+<tr>
+<td>Accept-Charset</td>
+<td>客户可以接受的字符集，如Unicode-1-1</td>
+</tr>
+<tr>
+<td>Accept-Encoding</td>
+<td>客户能处理的页面编码方法，如gzip</td>
+</tr>
+<tr>
+<td>Accept-Language</td>
+<td>客户能处理的自然语言,如en(英语)，zh- cn(简体中文)</td>
+</tr>
+<tr>
+<td>Host</td>
+<td>服务器的DNS名称。从URL中提取出来，必需。</td>
+</tr>
+<tr>
+<td>Authorization</td>
+<td>客户的信息凭据列表</td>
+</tr>
+<tr>
+<td>Cookie</td>
+<td>将以前设置的Cookie送回服务器器,可用来作为会话信息</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>消息被发送时的日期和时间</td>
+</tr>
+</tbody></table>
+<h3 id="2-2-响应报文"><a href="#2-2-响应报文" class="headerlink" title="2.2 响应报文"></a>2.2 响应报文</h3><h4 id="2-2-1-报文格式"><a href="#2-2-1-报文格式" class="headerlink" title="2.2.1 报文格式"></a>2.2.1 报文格式</h4><p>所有字段都是ASCII码</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">[版本][ ][状态码][ ][短语][CRLF]   <span class="comment">// 如HTTP/1.1 200 OK</span></span><br><span class="line">[首部字段名][:][ ][首部字段值][CRLF]</span><br><span class="line">[首部字段名][:][ ][首部字段值][CRLF]</span><br><span class="line">……</span><br><span class="line">[CRLF]</span><br><span class="line">[实体主体]</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-2-状态码"><a href="#2-2-2-状态码" class="headerlink" title="2.2.2 状态码"></a>2.2.2 状态码</h4><table>
+<thead>
+<tr>
+<th>状态码</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1xx</td>
+<td>通知信息</td>
+</tr>
+<tr>
+<td>2xx</td>
+<td>成功</td>
+</tr>
+<tr>
+<td>3xx</td>
+<td>重定向</td>
+</tr>
+<tr>
+<td>4xx</td>
+<td>客户端错误</td>
+</tr>
+<tr>
+<td>5xx</td>
+<td>服务器错误</td>
+</tr>
+</tbody></table>
+<h4 id="2-2-3-首部字段"><a href="#2-2-3-首部字段" class="headerlink" title="2.2.3 首部字段"></a>2.2.3 首部字段</h4><table>
+<thead>
+<tr>
+<th>头（header）</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Date</td>
+<td>消息被发送时的日期和时间</td>
+</tr>
+<tr>
+<td>Server</td>
+<td>关于服务器的信息，如Microsoft IS/6.0</td>
+</tr>
+<tr>
+<td>Content-Encoding</td>
+<td>内容是如何被编码的(如gzip)</td>
+</tr>
+<tr>
+<td>Content-Language</td>
+<td>页面所使用的自然语言</td>
+</tr>
+<tr>
+<td>Content-Length</td>
+<td>以字节计算的页面长度</td>
+</tr>
+<tr>
+<td>Content-Type</td>
+<td>页面的MIIME类型</td>
+</tr>
+<tr>
+<td>Last-Modified</td>
+<td>页面最后被修改的时间和日期，在页面缓存机制中意义重大</td>
+</tr>
+<tr>
+<td>Location</td>
+<td>指示客户将请求发送给别处，即重定向到另个URL</td>
+</tr>
+<tr>
+<td>Set-Cookie</td>
+<td>服务器希望客户保存一个Cookie</td>
+</tr>
+</tbody></table>
+<h1 id="http-1-1"><a href="#http-1-1" class="headerlink" title="http 1.1"></a>http 1.1</h1><h2 id="1-长连接"><a href="#1-长连接" class="headerlink" title="1. 长连接"></a>1. 长连接</h2><p>增加connection字段，通过设置keep-alive保持http连接不断。避免每次发送消息都要重新建立与释放TCP连接，提高网络利用率</p>
+<p>如果客户端想关闭http连接，可在请求头中携带Connection:false</p>
+<h1 id="http-2-0"><a href="#http-2-0" class="headerlink" title="http 2.0"></a>http 2.0</h1><p>二进制分帧</p>
+]]></content>
+      <categories>
+        <category>Network</category>
+      </categories>
+      <tags>
+        <tag>Network http</tag>
+      </tags>
+  </entry>
+</search>
