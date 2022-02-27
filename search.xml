@@ -261,12 +261,63 @@
 <h1 id="http-1-1"><a href="#http-1-1" class="headerlink" title="http 1.1"></a>http 1.1</h1><h2 id="1-长连接"><a href="#1-长连接" class="headerlink" title="1. 长连接"></a>1. 长连接</h2><p>增加connection字段，通过设置keep-alive保持http连接不断。避免每次发送消息都要重新建立与释放TCP连接，提高网络利用率</p>
 <p>如果客户端想关闭http连接，可在请求头中携带Connection:false</p>
 <h1 id="http-2-0"><a href="#http-2-0" class="headerlink" title="http 2.0"></a>http 2.0</h1><p>二进制分帧</p>
+<p><a href="https://cabulous.medium.com/http-2-and-how-it-works-9f645458e4b2">https://cabulous.medium.com/http-2-and-how-it-works-9f645458e4b2</a></p>
 ]]></content>
       <categories>
         <category>Network</category>
       </categories>
       <tags>
         <tag>Network http</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>GRPC-GO</title>
+    <url>/2022/02/08/GRPC-GO/</url>
+    <content><![CDATA[<p>​                                                                        <strong>TO BE CONTINUED</strong></p>
+<hr>
+<h1 id="1-rpc交互整体过程"><a href="#1-rpc交互整体过程" class="headerlink" title="1. rpc交互整体过程"></a>1. rpc交互整体过程</h1><h2 id="1-1-rpc链接"><a href="#1-1-rpc链接" class="headerlink" title="1.1 rpc链接"></a>1.1 rpc链接</h2><p>解析器-&gt;server地址列表</p>
+<p>平衡器-&gt;跟谁建立tcp链接</p>
+<p>net包-&gt;tcp链接</p>
+<p>http2帧交互过程，如接下来传输的帧的大小、窗口大小？（为什么会有这一步？）</p>
+<p><strong>Q: grpc over http2如何理解？？？</strong>   <a href="https://hengyun.tech/thinking-about-grpc-http2/">https://hengyun.tech/thinking-about-grpc-http2/</a></p>
+<p><a href="https://ninokop.github.io/2018/06/18/grpc-http2/">https://ninokop.github.io/2018/06/18/grpc-http2/</a></p>
+<p>图严格来说不准确，并不能代表绝对上的时间，只能从代表从某一方来看的相对时间，比如，对server来说，其会先发送设置帧、窗口更新帧，然后处理client发过来的PRI(PRI可能在server发送设置帧前就已发送到server,也可能在之后)，若在读取PRI时还未发送则reader会堵塞，直到有数据</p>
+<p><a href="https://kingjcy.github.io/post/golang/go-io/">golang io处理相关</a></p>
+<p>![0-grpc 建立连接](D:\allFile\blog\hexo\source_posts\GRPC-GO\0-grpc 建立连接.png)</p>
+<h2 id="1-2-rpc请求"><a href="#1-2-rpc请求" class="headerlink" title="1.2 rpc请求"></a>1.2 rpc请求</h2><h1 id="2-server端"><a href="#2-server端" class="headerlink" title="2. server端"></a>2. server端</h1><h2 id="2-1-服务注册"><a href="#2-1-服务注册" class="headerlink" title="2.1 服务注册"></a>2.1 服务注册</h2><p>也就是我们proto中定义的服务，包括四种类型，如：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="3-agent端"><a href="#3-agent端" class="headerlink" title="3. agent端"></a>3. agent端</h1><p>为什么grpc要支持地址的解析与选择？有什么痛点吗？</p>
+<p>resolver   balancer    picker</p>
+<p>解析地址-&gt;建立连接(一个/全部)-&gt;具体选择哪个进行通信</p>
+<h2 id="3-1-解析器"><a href="#3-1-解析器" class="headerlink" title="3.1 解析器"></a>3.1 解析器</h2><p>根据链接地址获取后端对应的grpc服务器地址列表</p>
+<h2 id="3-2-平衡器"><a href="#3-2-平衡器" class="headerlink" title="3.2 平衡器"></a>3.2 平衡器</h2><p>根据grpc服务器列表来建立tcp链接</p>
+<h3 id="3-2-1-pick-first"><a href="#3-2-1-pick-first" class="headerlink" title="3.2.1 pick-first"></a>3.2.1 pick-first</h3><h3 id="3-2-2-round-robin"><a href="#3-2-2-round-robin" class="headerlink" title="3.2.2 round-robin"></a>3.2.2 round-robin</h3><p>即轮询平衡器，这个轮询是指与所有解析出来的server地址都建立连接，轮询选择一个tcp连接进行使用</p>
+<p>Note:这个轮询具体是什么时间轮询？当前ClientConn断连时？那么对于长连接stream形式来说，这个轮询并没有起到LB作用？毕竟同一client频繁访问的话都是使用同一连接，发送请求到同一server。</p>
+<h3 id="3-2-3-grpclb"><a href="#3-2-3-grpclb" class="headerlink" title="3.2.3 grpclb"></a>3.2.3 grpclb</h3><p>提供接口供实现自定义lb以获取服务端列表 -&gt; 源码<code>GRPC_GO/balancer/grpclb/grpc_lb_v1</code>目录下</p>
+<p>也就是相当于实现自定义解析器，此解析器从grpc LB中获取server地址list，然后再根据pick-first或者round-robin选择连接一个或全部以及选择哪个连接进行通信</p>
+<p>此时client访问地址实际为LB地址，上述具体操作GRPC已帮助实现-&gt;<code>GRPC_GO/balancer/grpclb</code>下的代码中，Client创建连接时代码示例如下：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">serviceConfig:=<span class="string">`&#123;</span></span><br><span class="line"><span class="string">&quot;loadBalancingPolicy&quot;:&quot;grpclb&quot;,</span></span><br><span class="line"><span class="string">&quot;loadBalancingConfig&quot;:[</span></span><br><span class="line"><span class="string">    	&#123;</span></span><br><span class="line"><span class="string">            &quot;grpclb&quot;:&#123;</span></span><br><span class="line"><span class="string">                &quot;childPolicy&quot;:[</span></span><br><span class="line"><span class="string">               		&#123;&quot;round_robin&quot;:true&#125;</span></span><br><span class="line"><span class="string">                ]</span></span><br><span class="line"><span class="string">        	&#125;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    ]</span></span><br><span class="line"><span class="string">&#125;`</span></span><br><span class="line">conn,err:=grpc.Dial(fmt.Sprintf(<span class="string">&quot;%s:///%s&quot;</span>,<span class="string">&quot;define-resolver-name&quot;</span>,<span class="string">&quot;lbAddr&quot;</span>),grpc.WithBlock(),grpc.WithDefaultServiceConfig(serviceVonfig))</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+]]></content>
+      <tags>
+        <tag>GRPC</tag>
       </tags>
   </entry>
 </search>

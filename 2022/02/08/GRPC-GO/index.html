@@ -23,21 +23,21 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","version":"8.2.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="neither supercilious nor obsequious">
+<meta name="description" content="​                                                                        TO BE CONTINUED  1. rpc交互整体过程1.1 rpc链接解析器-&gt;server地址列表 平衡器-&gt;跟谁建立tcp链接 net包-&gt;tcp链接 http2帧交互过程，如接下来传输的帧的大小、窗口大小？（为什么会有这一步">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Fabric configtx.yaml详解">
-<meta property="og:url" content="http://example.com/2021/03/11/Fabric-configtx-yaml%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:title" content="GRPC-GO">
+<meta property="og:url" content="http://example.com/2022/02/08/GRPC-GO/index.html">
 <meta property="og:site_name" content="jjx">
-<meta property="og:description" content="neither supercilious nor obsequious">
+<meta property="og:description" content="​                                                                        TO BE CONTINUED  1. rpc交互整体过程1.1 rpc链接解析器-&gt;server地址列表 平衡器-&gt;跟谁建立tcp链接 net包-&gt;tcp链接 http2帧交互过程，如接下来传输的帧的大小、窗口大小？（为什么会有这一步">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2021-03-11T14:04:50.000Z">
-<meta property="article:modified_time" content="2021-11-13T03:20:44.472Z">
+<meta property="article:published_time" content="2022-02-08T14:31:46.000Z">
+<meta property="article:modified_time" content="2022-02-27T15:33:32.688Z">
 <meta property="article:author" content="suki">
-<meta property="article:tag" content="Fabric BlockChain">
+<meta property="article:tag" content="GRPC">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://example.com/2021/03/11/Fabric-configtx-yaml%E8%AF%A6%E8%A7%A3/">
+<link rel="canonical" href="http://example.com/2022/02/08/GRPC-GO/">
 
 
 <script class="page-configurations">
@@ -49,7 +49,7 @@
     lang   : 'en'
   };
 </script>
-<title>Fabric configtx.yaml详解 | jjx</title>
+<title>GRPC-GO | jjx</title>
   
 
 
@@ -175,7 +175,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           Table of Contents
@@ -188,6 +188,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-rpc%E4%BA%A4%E4%BA%92%E6%95%B4%E4%BD%93%E8%BF%87%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">1. rpc交互整体过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-rpc%E9%93%BE%E6%8E%A5"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 rpc链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-rpc%E8%AF%B7%E6%B1%82"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 rpc请求</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-server%E7%AB%AF"><span class="nav-number">2.</span> <span class="nav-text">2. server端</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 服务注册</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-agent%E7%AB%AF"><span class="nav-number">3.</span> <span class="nav-text">3. agent端</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%E8%A7%A3%E6%9E%90%E5%99%A8"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 解析器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-%E5%B9%B3%E8%A1%A1%E5%99%A8"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 平衡器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-1-pick-first"><span class="nav-number">3.2.1.</span> <span class="nav-text">3.2.1 pick-first</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-2-round-robin"><span class="nav-number">3.2.2.</span> <span class="nav-text">3.2.2 round-robin</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-3-grpclb"><span class="nav-number">3.2.3.</span> <span class="nav-text">3.2.3 grpclb</span></a></li></ol></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -255,7 +256,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/11/Fabric-configtx-yaml%E8%AF%A6%E8%A7%A3/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/02/08/GRPC-GO/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/lay.gif">
@@ -268,7 +269,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Fabric configtx.yaml详解
+          GRPC-GO
         </h1>
 
         <div class="post-meta-container">
@@ -279,24 +280,15 @@
       </span>
       <span class="post-meta-item-text">Posted on</span>
 
-      <time title="Created: 2021-03-11 22:04:50" itemprop="dateCreated datePublished" datetime="2021-03-11T22:04:50+08:00">2021-03-11</time>
+      <time title="Created: 2022-02-08 22:31:46" itemprop="dateCreated datePublished" datetime="2022-02-08T22:31:46+08:00">2022-02-08</time>
     </span>
       <span class="post-meta-item">
         <span class="post-meta-item-icon">
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">Edited on</span>
-        <time title="Modified: 2021-11-13 11:20:44" itemprop="dateModified" datetime="2021-11-13T11:20:44+08:00">2021-11-13</time>
+        <time title="Modified: 2022-02-27 23:33:32" itemprop="dateModified" datetime="2022-02-27T23:33:32+08:00">2022-02-27</time>
       </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Fabric/" itemprop="url" rel="index"><span itemprop="name">Fabric</span></a>
-        </span>
-    </span>
 
   
     <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
@@ -315,7 +307,49 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        
+        <p>​                                                                        <strong>TO BE CONTINUED</strong></p>
+<hr>
+<h1 id="1-rpc交互整体过程"><a href="#1-rpc交互整体过程" class="headerlink" title="1. rpc交互整体过程"></a>1. rpc交互整体过程</h1><h2 id="1-1-rpc链接"><a href="#1-1-rpc链接" class="headerlink" title="1.1 rpc链接"></a>1.1 rpc链接</h2><p>解析器-&gt;server地址列表</p>
+<p>平衡器-&gt;跟谁建立tcp链接</p>
+<p>net包-&gt;tcp链接</p>
+<p>http2帧交互过程，如接下来传输的帧的大小、窗口大小？（为什么会有这一步？）</p>
+<p><strong>Q: grpc over http2如何理解？？？</strong>   <a target="_blank" rel="noopener" href="https://hengyun.tech/thinking-about-grpc-http2/">https://hengyun.tech/thinking-about-grpc-http2/</a></p>
+<p><a target="_blank" rel="noopener" href="https://ninokop.github.io/2018/06/18/grpc-http2/">https://ninokop.github.io/2018/06/18/grpc-http2/</a></p>
+<p>图严格来说不准确，并不能代表绝对上的时间，只能从代表从某一方来看的相对时间，比如，对server来说，其会先发送设置帧、窗口更新帧，然后处理client发过来的PRI(PRI可能在server发送设置帧前就已发送到server,也可能在之后)，若在读取PRI时还未发送则reader会堵塞，直到有数据</p>
+<p><a target="_blank" rel="noopener" href="https://kingjcy.github.io/post/golang/go-io/">golang io处理相关</a></p>
+<p>![0-grpc 建立连接](D:\allFile\blog\hexo\source_posts\GRPC-GO\0-grpc 建立连接.png)</p>
+<h2 id="1-2-rpc请求"><a href="#1-2-rpc请求" class="headerlink" title="1.2 rpc请求"></a>1.2 rpc请求</h2><h1 id="2-server端"><a href="#2-server端" class="headerlink" title="2. server端"></a>2. server端</h1><h2 id="2-1-服务注册"><a href="#2-1-服务注册" class="headerlink" title="2.1 服务注册"></a>2.1 服务注册</h2><p>也就是我们proto中定义的服务，包括四种类型，如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="3-agent端"><a href="#3-agent端" class="headerlink" title="3. agent端"></a>3. agent端</h1><p>为什么grpc要支持地址的解析与选择？有什么痛点吗？</p>
+<p>resolver   balancer    picker</p>
+<p>解析地址-&gt;建立连接(一个/全部)-&gt;具体选择哪个进行通信</p>
+<h2 id="3-1-解析器"><a href="#3-1-解析器" class="headerlink" title="3.1 解析器"></a>3.1 解析器</h2><p>根据链接地址获取后端对应的grpc服务器地址列表</p>
+<h2 id="3-2-平衡器"><a href="#3-2-平衡器" class="headerlink" title="3.2 平衡器"></a>3.2 平衡器</h2><p>根据grpc服务器列表来建立tcp链接</p>
+<h3 id="3-2-1-pick-first"><a href="#3-2-1-pick-first" class="headerlink" title="3.2.1 pick-first"></a>3.2.1 pick-first</h3><h3 id="3-2-2-round-robin"><a href="#3-2-2-round-robin" class="headerlink" title="3.2.2 round-robin"></a>3.2.2 round-robin</h3><p>即轮询平衡器，这个轮询是指与所有解析出来的server地址都建立连接，轮询选择一个tcp连接进行使用</p>
+<p>Note:这个轮询具体是什么时间轮询？当前ClientConn断连时？那么对于长连接stream形式来说，这个轮询并没有起到LB作用？毕竟同一client频繁访问的话都是使用同一连接，发送请求到同一server。</p>
+<h3 id="3-2-3-grpclb"><a href="#3-2-3-grpclb" class="headerlink" title="3.2.3 grpclb"></a>3.2.3 grpclb</h3><p>提供接口供实现自定义lb以获取服务端列表 -&gt; 源码<code>GRPC_GO/balancer/grpclb/grpc_lb_v1</code>目录下</p>
+<p>也就是相当于实现自定义解析器，此解析器从grpc LB中获取server地址list，然后再根据pick-first或者round-robin选择连接一个或全部以及选择哪个连接进行通信</p>
+<p>此时client访问地址实际为LB地址，上述具体操作GRPC已帮助实现-&gt;<code>GRPC_GO/balancer/grpclb</code>下的代码中，Client创建连接时代码示例如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">serviceConfig:=<span class="string">`&#123;</span></span><br><span class="line"><span class="string">&quot;loadBalancingPolicy&quot;:&quot;grpclb&quot;,</span></span><br><span class="line"><span class="string">&quot;loadBalancingConfig&quot;:[</span></span><br><span class="line"><span class="string">    	&#123;</span></span><br><span class="line"><span class="string">            &quot;grpclb&quot;:&#123;</span></span><br><span class="line"><span class="string">                &quot;childPolicy&quot;:[</span></span><br><span class="line"><span class="string">               		&#123;&quot;round_robin&quot;:true&#125;</span></span><br><span class="line"><span class="string">                ]</span></span><br><span class="line"><span class="string">        	&#125;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    ]</span></span><br><span class="line"><span class="string">&#125;`</span></span><br><span class="line">conn,err:=grpc.Dial(fmt.Sprintf(<span class="string">&quot;%s:///%s&quot;</span>,<span class="string">&quot;define-resolver-name&quot;</span>,<span class="string">&quot;lbAddr&quot;</span>),grpc.WithBlock(),grpc.WithDefaultServiceConfig(serviceVonfig))</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </div>
 
     
@@ -334,21 +368,18 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Fabric-BlockChain/" rel="tag"># Fabric BlockChain</a>
+              <a href="/tags/GRPC/" rel="tag"># GRPC</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2021/03/11/vault/" rel="prev" title="vault">
-                  <i class="fa fa-chevron-left"></i> vault
+                <a href="/2021/09/24/http/" rel="prev" title="http">
+                  <i class="fa fa-chevron-left"></i> http
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2021/03/16/Fabric-Event/" rel="next" title="Fabric Event">
-                  Fabric Event <i class="fa fa-chevron-right"></i>
-                </a>
             </div>
           </div>
     </footer>
