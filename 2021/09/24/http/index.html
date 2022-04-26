@@ -23,15 +23,15 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","version":"8.2.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="http 1.01. 基本特征无状态 无连接的应用层协议 client每次请求都要和server建立一个TCP连接，server处理完成后哦立即断开连接，也就是一来一回一次通信，一请求一回答 那么存在的问题就是server无法主动发送消息给client，每次建立TCP连接也都要花费一定时间 由于http 1.0规定收到response才能发起下一个request，因此若一直未收到某response">
+<meta name="description" content="http 1.01. 基本特征无状态 无连接的应用层协议 client每次请求都要和server建立一个TCP连接，server处理完成后立即断开连接，也就是一来一回一次通信，一请求一回答 那么存在的问题就是server无法主动发送消息给client，每次建立TCP连接也都要花费一定时间 由于http 1.0规定收到response才能发起下一个request，因此若一直未收到某response，">
 <meta property="og:type" content="article">
 <meta property="og:title" content="http">
 <meta property="og:url" content="http://example.com/2021/09/24/http/index.html">
 <meta property="og:site_name" content="jjx">
-<meta property="og:description" content="http 1.01. 基本特征无状态 无连接的应用层协议 client每次请求都要和server建立一个TCP连接，server处理完成后哦立即断开连接，也就是一来一回一次通信，一请求一回答 那么存在的问题就是server无法主动发送消息给client，每次建立TCP连接也都要花费一定时间 由于http 1.0规定收到response才能发起下一个request，因此若一直未收到某response">
+<meta property="og:description" content="http 1.01. 基本特征无状态 无连接的应用层协议 client每次请求都要和server建立一个TCP连接，server处理完成后立即断开连接，也就是一来一回一次通信，一请求一回答 那么存在的问题就是server无法主动发送消息给client，每次建立TCP连接也都要花费一定时间 由于http 1.0规定收到response才能发起下一个request，因此若一直未收到某response，">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-09-24T14:50:54.000Z">
-<meta property="article:modified_time" content="2022-02-27T13:10:22.716Z">
+<meta property="article:modified_time" content="2022-04-05T06:00:05.610Z">
 <meta property="article:author" content="suki">
 <meta property="article:tag" content="Network http">
 <meta name="twitter:card" content="summary">
@@ -188,7 +188,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#http-1-0"><span class="nav-number">1.</span> <span class="nav-text">http 1.0</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%9F%BA%E6%9C%AC%E7%89%B9%E5%BE%81"><span class="nav-number">1.1.</span> <span class="nav-text">1. 基本特征</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%8A%A5%E6%96%87%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">2. 报文结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E8%AF%B7%E6%B1%82%E6%8A%A5%E6%96%87"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 请求报文</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-%E6%8A%A5%E6%96%87%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">2.1.1 报文格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-2-%E8%AF%B7%E6%B1%82%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">2.1.2 请求方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-3-%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">2.1.3 首部字段</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E5%93%8D%E5%BA%94%E6%8A%A5%E6%96%87"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 响应报文</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-%E6%8A%A5%E6%96%87%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">2.2.1 报文格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-%E7%8A%B6%E6%80%81%E7%A0%81"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">2.2.2 状态码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">2.2.3 首部字段</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#http-1-1"><span class="nav-number">2.</span> <span class="nav-text">http 1.1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E9%95%BF%E8%BF%9E%E6%8E%A5"><span class="nav-number">2.1.</span> <span class="nav-text">1. 长连接</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#http-2-0"><span class="nav-number">3.</span> <span class="nav-text">http 2.0</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#http-1-0"><span class="nav-number">1.</span> <span class="nav-text">http 1.0</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%9F%BA%E6%9C%AC%E7%89%B9%E5%BE%81"><span class="nav-number">1.1.</span> <span class="nav-text">1. 基本特征</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%8A%A5%E6%96%87%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">2. 报文结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E8%AF%B7%E6%B1%82%E6%8A%A5%E6%96%87"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 请求报文</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-%E6%8A%A5%E6%96%87%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">2.1.1 报文格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-2-%E8%AF%B7%E6%B1%82%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">2.1.2 请求方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-3-%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">2.1.3 首部字段</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E5%93%8D%E5%BA%94%E6%8A%A5%E6%96%87"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 响应报文</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-%E6%8A%A5%E6%96%87%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">2.2.1 报文格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-%E7%8A%B6%E6%80%81%E7%A0%81"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">2.2.2 状态码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">2.2.3 首部字段</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#http-1-1"><span class="nav-number">2.</span> <span class="nav-text">http 1.1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E9%95%BF%E8%BF%9E%E6%8E%A5"><span class="nav-number">2.1.</span> <span class="nav-text">1. 长连接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-chunked"><span class="nav-number">2.1.1.</span> <span class="nav-text">2. chunked</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-pipeline"><span class="nav-number">2.1.2.</span> <span class="nav-text">3. pipeline</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-host%E5%A4%B4%E9%83%A8"><span class="nav-number">2.1.3.</span> <span class="nav-text">3. host头部</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#http-2-0"><span class="nav-number">3.</span> <span class="nav-text">http 2.0</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -204,20 +204,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-count">11</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -287,7 +287,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">Edited on</span>
-        <time title="Modified: 2022-02-27 21:10:22" itemprop="dateModified" datetime="2022-02-27T21:10:22+08:00">2022-02-27</time>
+        <time title="Modified: 2022-04-05 14:00:05" itemprop="dateModified" datetime="2022-04-05T14:00:05+08:00">2022-04-05</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -317,7 +317,7 @@
     
     <div class="post-body" itemprop="articleBody">
         <h1 id="http-1-0"><a href="#http-1-0" class="headerlink" title="http 1.0"></a>http 1.0</h1><h2 id="1-基本特征"><a href="#1-基本特征" class="headerlink" title="1. 基本特征"></a>1. 基本特征</h2><p>无状态 无连接的应用层协议</p>
-<p>client每次请求都要和server建立一个TCP连接，server处理完成后哦立即断开连接，也就是一来一回一次通信，一请求一回答</p>
+<p>client每次请求都要和server建立一个TCP连接，server处理完成后立即断开连接，也就是一来一回一次通信，一请求一回答</p>
 <p>那么存在的问题就是server无法主动发送消息给client，每次建立TCP连接也都要花费一定时间</p>
 <p>由于http 1.0规定收到response才能发起下一个request，因此若一直未收到某response，那么将会阻塞其余的request</p>
 <h2 id="2-报文结构"><a href="#2-报文结构" class="headerlink" title="2. 报文结构"></a>2. 报文结构</h2><h3 id="2-1-请求报文"><a href="#2-1-请求报文" class="headerlink" title="2.1 请求报文"></a>2.1 请求报文</h3><h4 id="2-1-1-报文格式"><a href="#2-1-1-报文格式" class="headerlink" title="2.1.1 报文格式"></a>2.1.1 报文格式</h4><p>client—&gt;server   报文的所有字段都是ASCII码</p>
@@ -445,7 +445,18 @@
 </tbody></table>
 <h1 id="http-1-1"><a href="#http-1-1" class="headerlink" title="http 1.1"></a>http 1.1</h1><h2 id="1-长连接"><a href="#1-长连接" class="headerlink" title="1. 长连接"></a>1. 长连接</h2><p>增加connection字段，通过设置keep-alive保持http连接不断。避免每次发送消息都要重新建立与释放TCP连接，提高网络利用率</p>
 <p>如果客户端想关闭http连接，可在请求头中携带Connection:false</p>
-<h1 id="http-2-0"><a href="#http-2-0" class="headerlink" title="http 2.0"></a>http 2.0</h1><p>二进制分帧</p>
+<p>对于http1.0，client/server可以通过连接状态判断请求/响应边界，但是对于长连接来说，由于发送完请求/回复后依旧不断连，那么则需要其他方法来判断请求/响应边界，那么这个附加判断条件就是content-length，如果content-length和实际不一致会如何？通常来说content-length小于实际那么内容将会被截断，而且下一个请求解析出现错乱；content-length大于实际则会导致pending，误以为内容还没发送完。</p>
+<p>实际上可能会遇到要发送的内容过大的情况，此时就引入下面的chunked：</p>
+<h3 id="2-chunked"><a href="#2-chunked" class="headerlink" title="2. chunked"></a>2. chunked</h3><p>对于一次请求或者回复数据较大的情况，无法一次请求发送，允许在头部添加<code> Transfer-Encoding =chunked</code>字段，说明此次请求/应答分批次进行。 每个分块包含十六进制的长度值和数据，长度值独占一行，长度不包括它结尾的 CRLF（\r\n），也不包括分块数据结尾的 CRLF。最后一个分块长度值必须为 0，对应的分块数据没有内容，表示实体结束。 </p>
+<p>同样的，对于一次请求，必须chunked数据全部发送后，才能收到回复。</p>
+<p>例如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 请求中使用chunked</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">httpTest</span><span class="params">()</span></span>&#123;</span><br><span class="line">    pr,pw:=io.Pipe()</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span>&#123;</span><br><span class="line">        pw.Write([]<span class="keyword">byte</span>(<span class="string">&quot;test&quot;</span>)) </span><br><span class="line">        pw.Close()</span><br><span class="line">    &#125;()</span><br><span class="line">    request,err:=http.NewRequest(<span class="string">&quot;POST&quot;</span>,<span class="string">&quot;URL&quot;</span>,pr)</span><br><span class="line">    <span class="keyword">if</span> err!=<span class="literal">nil</span>&#123;</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 发送时会自动加上chunked header</span></span><br><span class="line">    resp,err:=http.DefaultClient.Do(request)</span><br><span class="line">    <span class="comment">//从resp.Body中读取数据</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//应答中使用chunked</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-pipeline"><a href="#3-pipeline" class="headerlink" title="3. pipeline"></a>3. pipeline</h3><p>TCP连接复用减少了连接建立关闭的时间，但是一问一答的串行方式仍然效率不高，如果前一个请求十分耗时，那么后序请求都会受到影响，被称为线头阻塞(head of line blocking)，因此http1.1引入pipeline机制，允许未收到应答就发送下一个请求，但收到响应的顺序和发送请求的顺序一致</p>
+<h3 id="3-host头部"><a href="#3-host头部" class="headerlink" title="3. host头部"></a>3. host头部</h3><p>TO BE CONTINUED</p>
+<h1 id="http-2-0"><a href="#http-2-0" class="headerlink" title="http 2.0"></a>http 2.0</h1><p>HTTP/1.1 版的头信息肯定是文本（ASCII编码），数据体可以是文本，也可以是二进制。HTTP/2 则是一个彻底的二进制协议，头信息和数据体都是二进制，并且统称为”帧”（frame）：头信息帧和数据帧。</p>
+<p>二进制协议的一个好处是，可以定义额外的帧。HTTP/2 定义了近十种帧，为将来的高级应用打好了基础。如果使用文本实现这种功能，解析数据将会变得非常麻烦，二进制解析则方便得多</p>
+<p>二进制分帧</p>
 <p><a target="_blank" rel="noopener" href="https://cabulous.medium.com/http-2-and-how-it-works-9f645458e4b2">https://cabulous.medium.com/http-2-and-how-it-works-9f645458e4b2</a></p>
 
     </div>
