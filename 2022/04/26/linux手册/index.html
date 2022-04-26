@@ -31,7 +31,7 @@
 <meta property="og:description" content="用户和用户组1. 背景linux是多用户多任务操作系统，允许多个用户同时登陆进行不同操作。为了对用户权限进行更好的管理，进而产生用户组的概念 整体串讲 2. 用户用户具有名称和id两个属性，id范围为0-65535， 根据用户名查看用户信息命令如下： 123id [用户名]# 以root为例，输出如下：uid&#x3D;0(root) gid&#x3D;0(root) groups&#x3D;0(root)    用户信息存储">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-04-26T14:42:59.000Z">
-<meta property="article:modified_time" content="2022-04-26T16:16:03.247Z">
+<meta property="article:modified_time" content="2022-04-26T16:19:57.596Z">
 <meta property="article:author" content="suki">
 <meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary">
@@ -287,7 +287,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">Edited on</span>
-        <time title="Modified: 2022-04-27 00:16:03" itemprop="dateModified" datetime="2022-04-27T00:16:03+08:00">2022-04-27</time>
+        <time title="Modified: 2022-04-27 00:19:57" itemprop="dateModified" datetime="2022-04-27T00:19:57+08:00">2022-04-27</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -323,6 +323,10 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">id [用户名]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 以root为例，输出如下：</span></span><br><span class="line">uid=0(root) gid=0(root) groups=0(root)  </span><br></pre></td></tr></table></figure>
 
 <p>用户信息存储在<code>/etc/passwd</code>文件中</p>
+<span id="more"></span>
+
+
+
 <h4 id="2-2-用户分类"><a href="#2-2-用户分类" class="headerlink" title="2.2 用户分类"></a>2.2 用户分类</h4><p>I：根据UID范围</p>
 <p>UID=0 -&gt; root：</p>
 <p>系统管理员超级用户，系统唯一，可以登陆系统，可以操作<strong>任何文件和命令</strong>，拥有最高权限</p>

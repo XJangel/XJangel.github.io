@@ -89,6 +89,12 @@
 <p>（1）程序退出时，停掉其他goroutine，避免内存泄漏</p>
 <figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 相关groutine会有以下判断，此时应通过close()来通知其他goroutine而不是通过向exitChan中发送真正的数据，如struct&#123;&#125;&#123;&#125;。原因在于若发送真正的数据，由于有多个消费者，那么要发送相应数量的数据才能让每个gorouine获取到数据，执行退出。而close()执行之后每个消费者都能获取到一个数据，后者实现相对简单优雅。</span></span><br><span class="line"><span class="keyword">for</span>&#123;</span><br><span class="line">    <span class="keyword">select</span>&#123;</span><br><span class="line">        <span class="keyword">case</span> _ = &lt;- exitChan:</span><br><span class="line">        	........</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+
+
+<span id="more"></span>
+
+
+
 <h1 id="二、编程思路借鉴"><a href="#二、编程思路借鉴" class="headerlink" title="二、编程思路借鉴"></a>二、编程思路借鉴</h1><h2 id="2-1-对同一对象的频繁操作下的错误处理"><a href="#2-1-对同一对象的频繁操作下的错误处理" class="headerlink" title="2.1 对同一对象的频繁操作下的错误处理"></a>2.1 对同一对象的频繁操作下的错误处理</h2><h3 id="2-1-1-一般情况"><a href="#2-1-1-一般情况" class="headerlink" title="2.1.1 一般情况"></a>2.1.1 一般情况</h3><p>挨个执行并进行err判断</p>
 <figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> err!=<span class="literal">nil</span>&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -199,6 +205,10 @@
 <td>消息被发送时的日期和时间</td>
 </tr>
 </tbody></table>
+<span id="more"></span>
+
+
+
 <h3 id="2-2-响应报文"><a href="#2-2-响应报文" class="headerlink" title="2.2 响应报文"></a>2.2 响应报文</h3><h4 id="2-2-1-报文格式"><a href="#2-2-1-报文格式" class="headerlink" title="2.2.1 报文格式"></a>2.2.1 报文格式</h4><p>所有字段都是ASCII码</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">[版本][ ][状态码][ ][短语][CRLF]   <span class="comment">// 如HTTP/1.1 200 OK</span></span><br><span class="line">[首部字段名][:][ ][首部字段值][CRLF]</span><br><span class="line">[首部字段名][:][ ][首部字段值][CRLF]</span><br><span class="line">……</span><br><span class="line">[CRLF]</span><br><span class="line">[实体主体]</span><br></pre></td></tr></table></figure>
 
@@ -311,6 +321,10 @@
 <p>图严格来说不准确，并不能代表绝对上的时间，只能从代表从某一方来看的相对时间，比如，对server来说，其会先发送设置帧、窗口更新帧，然后处理client发过来的PRI(PRI可能在server发送设置帧前就已发送到server,也可能在之后)，若在读取PRI时还未发送则reader会堵塞，直到有数据</p>
 <p><a href="https://kingjcy.github.io/post/golang/go-io/">golang io处理相关</a></p>
 <p>![0-grpc 建立连接](D:\allFile\blog\hexo\source_posts\GRPC-GO\0-grpc 建立连接.png)</p>
+<span id="more"></span>
+
+
+
 <h2 id="1-2-rpc请求"><a href="#1-2-rpc请求" class="headerlink" title="1.2 rpc请求"></a>1.2 rpc请求</h2><h1 id="2-server端"><a href="#2-server端" class="headerlink" title="2. server端"></a>2. server端</h1><h2 id="2-1-服务注册"><a href="#2-1-服务注册" class="headerlink" title="2.1 服务注册"></a>2.1 服务注册</h2><p>也就是我们proto中定义的服务，包括四种类型，如：</p>
 <figure class="highlight go"><table><tr><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
 
@@ -362,6 +376,10 @@
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">id [用户名]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 以root为例，输出如下：</span></span><br><span class="line">uid=0(root) gid=0(root) groups=0(root)  </span><br></pre></td></tr></table></figure>
 
 <p>用户信息存储在<code>/etc/passwd</code>文件中</p>
+<span id="more"></span>
+
+
+
 <h4 id="2-2-用户分类"><a href="#2-2-用户分类" class="headerlink" title="2.2 用户分类"></a>2.2 用户分类</h4><p>I：根据UID范围</p>
 <p>UID=0 -&gt; root：</p>
 <p>系统管理员超级用户，系统唯一，可以登陆系统，可以操作<strong>任何文件和命令</strong>，拥有最高权限</p>

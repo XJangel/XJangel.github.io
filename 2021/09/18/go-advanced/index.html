@@ -31,7 +31,7 @@
 <meta property="og:description" content="go一、基础知识1.1 数据结构1.1.1 slice1.2 channelGO中的channel分为有缓存的channel以及无缓存channel，channel的出现是为了用于不同协程之间的通信 12channel chan stringchannel&#x3D;make(string,&lt;size&gt;)  对于channel的消费模型，可以分为以下几种：  一写一读 一写多读 多读一写 多读多">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-09-17T16:28:59.000Z">
-<meta property="article:modified_time" content="2022-04-01T14:45:51.513Z">
+<meta property="article:modified_time" content="2022-04-26T16:20:38.093Z">
 <meta property="article:author" content="suki">
 <meta property="article:tag" content="Go">
 <meta name="twitter:card" content="summary">
@@ -287,7 +287,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">Edited on</span>
-        <time title="Modified: 2022-04-01 22:45:51" itemprop="dateModified" datetime="2022-04-01T22:45:51+08:00">2022-04-01</time>
+        <time title="Modified: 2022-04-27 00:20:38" itemprop="dateModified" datetime="2022-04-27T00:20:38+08:00">2022-04-27</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -329,6 +329,12 @@
 <p>经典使用场景：</p>
 <p>（1）程序退出时，停掉其他goroutine，避免内存泄漏</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 相关groutine会有以下判断，此时应通过close()来通知其他goroutine而不是通过向exitChan中发送真正的数据，如struct&#123;&#125;&#123;&#125;。原因在于若发送真正的数据，由于有多个消费者，那么要发送相应数量的数据才能让每个gorouine获取到数据，执行退出。而close()执行之后每个消费者都能获取到一个数据，后者实现相对简单优雅。</span></span><br><span class="line"><span class="keyword">for</span>&#123;</span><br><span class="line">    <span class="keyword">select</span>&#123;</span><br><span class="line">        <span class="keyword">case</span> _ = &lt;- exitChan:</span><br><span class="line">        	........</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<span id="more"></span>
+
+
 
 <h1 id="二、编程思路借鉴"><a href="#二、编程思路借鉴" class="headerlink" title="二、编程思路借鉴"></a>二、编程思路借鉴</h1><h2 id="2-1-对同一对象的频繁操作下的错误处理"><a href="#2-1-对同一对象的频繁操作下的错误处理" class="headerlink" title="2.1 对同一对象的频繁操作下的错误处理"></a>2.1 对同一对象的频繁操作下的错误处理</h2><h3 id="2-1-1-一般情况"><a href="#2-1-1-一般情况" class="headerlink" title="2.1.1 一般情况"></a>2.1.1 一般情况</h3><p>挨个执行并进行err判断</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err!=<span class="literal">nil</span>&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>

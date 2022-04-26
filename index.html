@@ -282,7 +282,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">Edited on</span>
-        <time title="Modified: 2022-04-27 00:16:03" itemprop="dateModified" datetime="2022-04-27T00:16:03+08:00">2022-04-27</time>
+        <time title="Modified: 2022-04-27 00:19:57" itemprop="dateModified" datetime="2022-04-27T00:19:57+08:00">2022-04-27</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -311,50 +311,14 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">id [用户名]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 以root为例，输出如下：</span></span><br><span class="line">uid=0(root) gid=0(root) groups=0(root)  </span><br></pre></td></tr></table></figure>
 
 <p>用户信息存储在<code>/etc/passwd</code>文件中</p>
-<h4 id="2-2-用户分类"><a href="#2-2-用户分类" class="headerlink" title="2.2 用户分类"></a>2.2 用户分类</h4><p>I：根据UID范围</p>
-<p>UID=0 -&gt; root：</p>
-<p>系统管理员超级用户，系统唯一，可以登陆系统，可以操作<strong>任何文件和命令</strong>，拥有最高权限</p>
-<p>UID=1-999 -&gt; 系统用户：</p>
-<p>UID=1000-65535（2.6.x 内核之前）、1000-2<sup>32</sup>-1（2.6.x 内核之后） -&gt; 普通用户：</p>
-<p>II：根据是否可以登录（待斟酌）</p>
-<p>虚拟用户：不可登录，只能某些服务运行时使用？</p>
-<p>真实用户：可登录</p>
-<h4 id="2-2-切换用户"><a href="#2-2-切换用户" class="headerlink" title="2.2 切换用户"></a>2.2 切换用户</h4><p>//TODO：待补充</p>
-<p>su su -  sudo 等等</p>
-<p>wheel用户组？</p>
-<h4 id="2-3-实际用户-有效用户"><a href="#2-3-实际用户-有效用户" class="headerlink" title="2.3 实际用户/有效用户"></a>2.3 实际用户/有效用户</h4><p><a target="_blank" rel="noopener" href="http://wjhsh.net/keviwu-p-6104838.html">例子介绍</a></p>
-<h3 id="3-用户组"><a href="#3-用户组" class="headerlink" title="3. 用户组"></a>3. 用户组</h3><p>用户组同样具有名称和id两个属性，用户组id范围为：，同样0号是root用户组</p>
-<p>执行如下命令可显示当前用户的所有用户组（主组+附加组）</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">groups</span><br></pre></td></tr></table></figure>
-
-<p>用户组信息存储在<code>/etc/group</code>中，内容如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/group</span><br><span class="line">  user1:x:1002:</span><br></pre></td></tr></table></figure>
-
-<p> 每个用户组为一条记录，四个字段分别为：用户组名，密码(不直接显示)，组ID，组内用户列表（仅显示将该组作为附加组的用户） </p>
-<h4 id="3-1-主组与附属组"><a href="#3-1-主组与附属组" class="headerlink" title="3.1 主组与附属组"></a>3.1 主组与附属组</h4><p>主组，是用户的基本属组，使用<code>useradd</code>命令创建用户时若未指定用户组则会默认自动生成相同名称的用户组作为此用户的主组（前提如下）：</p>
-<p> The group name or number of the user′s initial login group. The group name must exist. A group number must refer to an already existing group.<br>If not specified, the bahavior of useradd will depend on the <strong>USERGROUPS_ENAB</strong> variable in <strong>/etc/login.defs</strong>. If this variable is set to yes (or -U/–user-group is specified on the command line), a group will be created for the user, with the same name as her login name. If the variable is set to no (or -N/–no-user-group is specified on the command line), useradd will set the primary group of the new user to the value specified by the GROUP variable in  <strong>/etc/default/useradd</strong>, or 100 by default. </p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 创建用户时指定主组</span></span><br><span class="line">useradd -g [主组名称] 用户名称</span><br></pre></td></tr></table></figure>
-
-<p>用户组必须有且只有一个主组，可以有0个或者N个附属组，用于的gid即为主组id， 当用户own某个文件或目录时，默认该文件或目录的group owner为该用户的<strong>主组</strong>（当然，可以通过chgrp修改group owner） </p>
-<p>用户可以更改主组，但不可从主组中删除，但可以从附属组中删除；若删除用户时此用户主组中无其他用户，那么主组将被一同删除</p>
-<h3 id="4-文件-进程与用户-用户组"><a href="#4-文件-进程与用户-用户组" class="headerlink" title="4. 文件/进程与用户/用户组"></a>4. 文件/进程与用户/用户组</h3><h4 id="4-1-文件与用户-用户组"><a href="#4-1-文件与用户-用户组" class="headerlink" title="4.1 文件与用户/用户组"></a>4.1 文件与用户/用户组</h4><p><strong>文件权限</strong></p>
-<p>一个文件的所有者总是能够修改文件的权限，除非这个用户不能访问包含此文件的目录</p>
-<p>r w x</p>
-<p>一个没有<code>x</code>权限的脚本可以通过bash xxx.sh执行</p>
-<p><strong>目录权限</strong></p>
-<p>r： 有权查看目录内都有什么文件 </p>
-<p>w： 在目录内新建文件 </p>
-<p>x： 访问目录内的文件</p>
-<p>因此如果想读取某个目录下的文件，那么需要前面所有目录的<code>x</code>权限以及文件的<code>r</code>权限</p>
-<h4 id="4-2-进程与用户-用户组"><a href="#4-2-进程与用户-用户组" class="headerlink" title="4.2 进程与用户/用户组"></a>4.2 进程与用户/用户组</h4><ul>
-<li>用户只能控制<strong>属于自己</strong>的进程</li>
-<li>…除非用户是”root” - 它可以控制运行在系统中的任意进程</li>
-<li>…假定一个进程没有处于非常”僵硬”的状态。</li>
-<li>使用PID(进程ID)终止一个进程：</li>
-</ul>
-<p>进程对文件的操作权限取决于其运行的用户</p>
-<p>进程的有效用户组用于文件权限检查</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/04/26/linux%E6%89%8B%E5%86%8C/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -483,7 +447,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">Edited on</span>
-        <time title="Modified: 2022-02-27 23:33:32" itemprop="dateModified" datetime="2022-02-27T23:33:32+08:00">2022-02-27</time>
+        <time title="Modified: 2022-04-27 00:20:43" itemprop="dateModified" datetime="2022-04-27T00:20:43+08:00">2022-04-27</time>
       </span>
 
   
@@ -507,38 +471,14 @@
 <p>图严格来说不准确，并不能代表绝对上的时间，只能从代表从某一方来看的相对时间，比如，对server来说，其会先发送设置帧、窗口更新帧，然后处理client发过来的PRI(PRI可能在server发送设置帧前就已发送到server,也可能在之后)，若在读取PRI时还未发送则reader会堵塞，直到有数据</p>
 <p><a target="_blank" rel="noopener" href="https://kingjcy.github.io/post/golang/go-io/">golang io处理相关</a></p>
 <p>![0-grpc 建立连接](D:\allFile\blog\hexo\source_posts\GRPC-GO\0-grpc 建立连接.png)</p>
-<h2 id="1-2-rpc请求"><a href="#1-2-rpc请求" class="headerlink" title="1.2 rpc请求"></a>1.2 rpc请求</h2><h1 id="2-server端"><a href="#2-server端" class="headerlink" title="2. server端"></a>2. server端</h1><h2 id="2-1-服务注册"><a href="#2-1-服务注册" class="headerlink" title="2.1 服务注册"></a>2.1 服务注册</h2><p>也就是我们proto中定义的服务，包括四种类型，如：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<h1 id="3-agent端"><a href="#3-agent端" class="headerlink" title="3. agent端"></a>3. agent端</h1><p>为什么grpc要支持地址的解析与选择？有什么痛点吗？</p>
-<p>resolver   balancer    picker</p>
-<p>解析地址-&gt;建立连接(一个/全部)-&gt;具体选择哪个进行通信</p>
-<h2 id="3-1-解析器"><a href="#3-1-解析器" class="headerlink" title="3.1 解析器"></a>3.1 解析器</h2><p>根据链接地址获取后端对应的grpc服务器地址列表</p>
-<h2 id="3-2-平衡器"><a href="#3-2-平衡器" class="headerlink" title="3.2 平衡器"></a>3.2 平衡器</h2><p>根据grpc服务器列表来建立tcp链接</p>
-<h3 id="3-2-1-pick-first"><a href="#3-2-1-pick-first" class="headerlink" title="3.2.1 pick-first"></a>3.2.1 pick-first</h3><h3 id="3-2-2-round-robin"><a href="#3-2-2-round-robin" class="headerlink" title="3.2.2 round-robin"></a>3.2.2 round-robin</h3><p>即轮询平衡器，这个轮询是指与所有解析出来的server地址都建立连接，轮询选择一个tcp连接进行使用</p>
-<p>Note:这个轮询具体是什么时间轮询？当前ClientConn断连时？那么对于长连接stream形式来说，这个轮询并没有起到LB作用？毕竟同一client频繁访问的话都是使用同一连接，发送请求到同一server。</p>
-<h3 id="3-2-3-grpclb"><a href="#3-2-3-grpclb" class="headerlink" title="3.2.3 grpclb"></a>3.2.3 grpclb</h3><p>提供接口供实现自定义lb以获取服务端列表 -&gt; 源码<code>GRPC_GO/balancer/grpclb/grpc_lb_v1</code>目录下</p>
-<p>也就是相当于实现自定义解析器，此解析器从grpc LB中获取server地址list，然后再根据pick-first或者round-robin选择连接一个或全部以及选择哪个连接进行通信</p>
-<p>此时client访问地址实际为LB地址，上述具体操作GRPC已帮助实现-&gt;<code>GRPC_GO/balancer/grpclb</code>下的代码中，Client创建连接时代码示例如下：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">serviceConfig:=<span class="string">`&#123;</span></span><br><span class="line"><span class="string">&quot;loadBalancingPolicy&quot;:&quot;grpclb&quot;,</span></span><br><span class="line"><span class="string">&quot;loadBalancingConfig&quot;:[</span></span><br><span class="line"><span class="string">    	&#123;</span></span><br><span class="line"><span class="string">            &quot;grpclb&quot;:&#123;</span></span><br><span class="line"><span class="string">                &quot;childPolicy&quot;:[</span></span><br><span class="line"><span class="string">               		&#123;&quot;round_robin&quot;:true&#125;</span></span><br><span class="line"><span class="string">                ]</span></span><br><span class="line"><span class="string">        	&#125;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    ]</span></span><br><span class="line"><span class="string">&#125;`</span></span><br><span class="line">conn,err:=grpc.Dial(fmt.Sprintf(<span class="string">&quot;%s:///%s&quot;</span>,<span class="string">&quot;define-resolver-name&quot;</span>,<span class="string">&quot;lbAddr&quot;</span>),grpc.WithBlock(),grpc.WithDefaultServiceConfig(serviceVonfig))</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/02/08/GRPC-GO/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -599,7 +539,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">Edited on</span>
-        <time title="Modified: 2022-04-05 14:00:05" itemprop="dateModified" datetime="2022-04-05T14:00:05+08:00">2022-04-05</time>
+        <time title="Modified: 2022-04-27 00:20:09" itemprop="dateModified" datetime="2022-04-27T00:20:09+08:00">2022-04-27</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -673,97 +613,14 @@
 <td>消息被发送时的日期和时间</td>
 </tr>
 </tbody></table>
-<h3 id="2-2-响应报文"><a href="#2-2-响应报文" class="headerlink" title="2.2 响应报文"></a>2.2 响应报文</h3><h4 id="2-2-1-报文格式"><a href="#2-2-1-报文格式" class="headerlink" title="2.2.1 报文格式"></a>2.2.1 报文格式</h4><p>所有字段都是ASCII码</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[版本][ ][状态码][ ][短语][CRLF]   <span class="comment">// 如HTTP/1.1 200 OK</span></span><br><span class="line">[首部字段名][:][ ][首部字段值][CRLF]</span><br><span class="line">[首部字段名][:][ ][首部字段值][CRLF]</span><br><span class="line">……</span><br><span class="line">[CRLF]</span><br><span class="line">[实体主体]</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-2-2-状态码"><a href="#2-2-2-状态码" class="headerlink" title="2.2.2 状态码"></a>2.2.2 状态码</h4><table>
-<thead>
-<tr>
-<th>状态码</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1xx</td>
-<td>通知信息</td>
-</tr>
-<tr>
-<td>2xx</td>
-<td>成功</td>
-</tr>
-<tr>
-<td>3xx</td>
-<td>重定向</td>
-</tr>
-<tr>
-<td>4xx</td>
-<td>客户端错误</td>
-</tr>
-<tr>
-<td>5xx</td>
-<td>服务器错误</td>
-</tr>
-</tbody></table>
-<h4 id="2-2-3-首部字段"><a href="#2-2-3-首部字段" class="headerlink" title="2.2.3 首部字段"></a>2.2.3 首部字段</h4><table>
-<thead>
-<tr>
-<th>头（header）</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Date</td>
-<td>消息被发送时的日期和时间</td>
-</tr>
-<tr>
-<td>Server</td>
-<td>关于服务器的信息，如Microsoft IS/6.0</td>
-</tr>
-<tr>
-<td>Content-Encoding</td>
-<td>内容是如何被编码的(如gzip)</td>
-</tr>
-<tr>
-<td>Content-Language</td>
-<td>页面所使用的自然语言</td>
-</tr>
-<tr>
-<td>Content-Length</td>
-<td>以字节计算的页面长度</td>
-</tr>
-<tr>
-<td>Content-Type</td>
-<td>页面的MIIME类型</td>
-</tr>
-<tr>
-<td>Last-Modified</td>
-<td>页面最后被修改的时间和日期，在页面缓存机制中意义重大</td>
-</tr>
-<tr>
-<td>Location</td>
-<td>指示客户将请求发送给别处，即重定向到另个URL</td>
-</tr>
-<tr>
-<td>Set-Cookie</td>
-<td>服务器希望客户保存一个Cookie</td>
-</tr>
-</tbody></table>
-<h1 id="http-1-1"><a href="#http-1-1" class="headerlink" title="http 1.1"></a>http 1.1</h1><h2 id="1-长连接"><a href="#1-长连接" class="headerlink" title="1. 长连接"></a>1. 长连接</h2><p>增加connection字段，通过设置keep-alive保持http连接不断。避免每次发送消息都要重新建立与释放TCP连接，提高网络利用率</p>
-<p>如果客户端想关闭http连接，可在请求头中携带Connection:false</p>
-<p>对于http1.0，client/server可以通过连接状态判断请求/响应边界，但是对于长连接来说，由于发送完请求/回复后依旧不断连，那么则需要其他方法来判断请求/响应边界，那么这个附加判断条件就是content-length，如果content-length和实际不一致会如何？通常来说content-length小于实际那么内容将会被截断，而且下一个请求解析出现错乱；content-length大于实际则会导致pending，误以为内容还没发送完。</p>
-<p>实际上可能会遇到要发送的内容过大的情况，此时就引入下面的chunked：</p>
-<h3 id="2-chunked"><a href="#2-chunked" class="headerlink" title="2. chunked"></a>2. chunked</h3><p>对于一次请求或者回复数据较大的情况，无法一次请求发送，允许在头部添加<code> Transfer-Encoding =chunked</code>字段，说明此次请求/应答分批次进行。 每个分块包含十六进制的长度值和数据，长度值独占一行，长度不包括它结尾的 CRLF（\r\n），也不包括分块数据结尾的 CRLF。最后一个分块长度值必须为 0，对应的分块数据没有内容，表示实体结束。 </p>
-<p>同样的，对于一次请求，必须chunked数据全部发送后，才能收到回复。</p>
-<p>例如：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 请求中使用chunked</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">httpTest</span><span class="params">()</span></span>&#123;</span><br><span class="line">    pr,pw:=io.Pipe()</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span>&#123;</span><br><span class="line">        pw.Write([]<span class="keyword">byte</span>(<span class="string">&quot;test&quot;</span>)) </span><br><span class="line">        pw.Close()</span><br><span class="line">    &#125;()</span><br><span class="line">    request,err:=http.NewRequest(<span class="string">&quot;POST&quot;</span>,<span class="string">&quot;URL&quot;</span>,pr)</span><br><span class="line">    <span class="keyword">if</span> err!=<span class="literal">nil</span>&#123;</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 发送时会自动加上chunked header</span></span><br><span class="line">    resp,err:=http.DefaultClient.Do(request)</span><br><span class="line">    <span class="comment">//从resp.Body中读取数据</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//应答中使用chunked</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h3 id="3-pipeline"><a href="#3-pipeline" class="headerlink" title="3. pipeline"></a>3. pipeline</h3><p>TCP连接复用减少了连接建立关闭的时间，但是一问一答的串行方式仍然效率不高，如果前一个请求十分耗时，那么后序请求都会受到影响，被称为线头阻塞(head of line blocking)，因此http1.1引入pipeline机制，允许未收到应答就发送下一个请求，但收到响应的顺序和发送请求的顺序一致</p>
-<h3 id="3-host头部"><a href="#3-host头部" class="headerlink" title="3. host头部"></a>3. host头部</h3><p>TO BE CONTINUED</p>
-<h1 id="http-2-0"><a href="#http-2-0" class="headerlink" title="http 2.0"></a>http 2.0</h1><p>HTTP/1.1 版的头信息肯定是文本（ASCII编码），数据体可以是文本，也可以是二进制。HTTP/2 则是一个彻底的二进制协议，头信息和数据体都是二进制，并且统称为”帧”（frame）：头信息帧和数据帧。</p>
-<p>二进制协议的一个好处是，可以定义额外的帧。HTTP/2 定义了近十种帧，为将来的高级应用打好了基础。如果使用文本实现这种功能，解析数据将会变得非常麻烦，二进制解析则方便得多</p>
-<p>二进制分帧</p>
-<p><a target="_blank" rel="noopener" href="https://cabulous.medium.com/http-2-and-how-it-works-9f645458e4b2">https://cabulous.medium.com/http-2-and-how-it-works-9f645458e4b2</a></p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/09/24/http/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -824,7 +681,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">Edited on</span>
-        <time title="Modified: 2022-04-01 22:45:51" itemprop="dateModified" datetime="2022-04-01T22:45:51+08:00">2022-04-01</time>
+        <time title="Modified: 2022-04-27 00:20:38" itemprop="dateModified" datetime="2022-04-27T00:20:38+08:00">2022-04-27</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -859,24 +716,14 @@
 <p>经典使用场景：</p>
 <p>（1）程序退出时，停掉其他goroutine，避免内存泄漏</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 相关groutine会有以下判断，此时应通过close()来通知其他goroutine而不是通过向exitChan中发送真正的数据，如struct&#123;&#125;&#123;&#125;。原因在于若发送真正的数据，由于有多个消费者，那么要发送相应数量的数据才能让每个gorouine获取到数据，执行退出。而close()执行之后每个消费者都能获取到一个数据，后者实现相对简单优雅。</span></span><br><span class="line"><span class="keyword">for</span>&#123;</span><br><span class="line">    <span class="keyword">select</span>&#123;</span><br><span class="line">        <span class="keyword">case</span> _ = &lt;- exitChan:</span><br><span class="line">        	........</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h1 id="二、编程思路借鉴"><a href="#二、编程思路借鉴" class="headerlink" title="二、编程思路借鉴"></a>二、编程思路借鉴</h1><h2 id="2-1-对同一对象的频繁操作下的错误处理"><a href="#2-1-对同一对象的频繁操作下的错误处理" class="headerlink" title="2.1 对同一对象的频繁操作下的错误处理"></a>2.1 对同一对象的频繁操作下的错误处理</h2><h3 id="2-1-1-一般情况"><a href="#2-1-1-一般情况" class="headerlink" title="2.1.1 一般情况"></a>2.1.1 一般情况</h3><p>挨个执行并进行err判断</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err!=<span class="literal">nil</span>&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-1-2-函数式编程"><a href="#2-1-2-函数式编程" class="headerlink" title="2.1.2 函数式编程"></a>2.1.2 函数式编程</h3><p>将频繁执行的部分抽出作为一个函数</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">parse</span><span class="params">(r io.Reader)</span> <span class="params">(*Point, error)</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> p Point</span><br><span class="line">    <span class="keyword">var</span> err error</span><br><span class="line">    <span class="comment">// 定义函数</span></span><br><span class="line">    read := <span class="function"><span class="keyword">func</span><span class="params">(data <span class="keyword">interface</span>&#123;&#125;)</span></span> &#123;</span><br><span class="line">        <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        &#125;</span><br><span class="line">        err = binary.Read(r, binary.BigEndian, data)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    read(&amp;p.Longitude)</span><br><span class="line">    read(&amp;p.Latitude)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> &amp;p, err</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> &amp;p, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-1-3-最后判断"><a href="#2-1-3-最后判断" class="headerlink" title="2.1.3 最后判断"></a>2.1.3 最后判断</h3><p>并不在每次执行后进行错误判断，而是通过定义结构体，将err作为属性，定义结构体函数进行重复化操作，最后判断err是否为nil</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Reader <span class="keyword">struct</span> &#123;</span><br><span class="line">    r   io.Reader</span><br><span class="line">    err error</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *Reader)</span> <span class="title">read</span><span class="params">(data <span class="keyword">interface</span>&#123;&#125;)</span></span> &#123;</span><br><span class="line">    <span class="comment">// 若之前执行未出错 则继续向下执行</span></span><br><span class="line">    <span class="keyword">if</span> r.err == <span class="literal">nil</span> &#123;</span><br><span class="line">        r.err = binary.Read(r.r, binary.BigEndian, data)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">parse</span><span class="params">(input io.Reader)</span> <span class="params">(*Point, error)</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> p Point</span><br><span class="line">    r := Reader&#123;r: input&#125;</span><br><span class="line"></span><br><span class="line">    r.read(&amp;p.Longitude)</span><br><span class="line">    r.read(&amp;p.Latitude)</span><br><span class="line">    r.read(&amp;p.Distance)</span><br><span class="line">    r.read(&amp;p.ElevationGain)</span><br><span class="line">    r.read(&amp;p.ElevationLoss)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> r.err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, r.err</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> &amp;p, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>Note:</strong>   <code>github.com/pkg/errors</code>库的使用需进一步学习以便更好使用。</p>
-<h2 id="2-2-函数式编程实现自定义配置渲染"><a href="#2-2-函数式编程实现自定义配置渲染" class="headerlink" title="2.2 函数式编程实现自定义配置渲染"></a>2.2 函数式编程实现自定义配置渲染</h2><p>！！十分常用，比如grpc创建client/server时的配置传参</p>
-<p><a target="_blank" rel="noopener" href="https://coolshell.cn/articles/21146.html">参考博客</a></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义一个函数类型</span></span><br><span class="line"><span class="keyword">type</span> Option <span class="function"><span class="keyword">func</span><span class="params">(*Server)</span></span></span><br><span class="line"><span class="comment">// 定义一组函数,实现将传入参数渲染到server中</span></span><br><span class="line"><span class="comment">// 对于Protocol()来说，假如传参为“tcp”，那么将返回函数：func(s *Server)&#123;s.Protocol=&quot;tcp&quot;&#125;</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Protocol</span><span class="params">(p <span class="keyword">string</span>)</span> <span class="title">Option</span></span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(s *Server)</span></span> &#123;</span><br><span class="line">        s.Protocol = p</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Timeout</span><span class="params">(timeout time.Duration)</span> <span class="title">Option</span></span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(s *Server)</span></span> &#123;</span><br><span class="line">        s.Timeout = timeout</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">MaxConns</span><span class="params">(maxconns <span class="keyword">int</span>)</span> <span class="title">Option</span></span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(s *Server)</span></span> &#123;</span><br><span class="line">        s.MaxConns = maxconns</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TLS</span><span class="params">(tls *tls.Config)</span> <span class="title">Option</span></span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(s *Server)</span></span> &#123;</span><br><span class="line">        s.TLS = tls</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 前面为必选参数，后面为可选参数</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewServer</span><span class="params">(addr <span class="keyword">string</span>, port <span class="keyword">int</span>, options ...<span class="keyword">func</span>(*Server)</span>) <span class="params">(*Server, error)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">  srv := Server&#123;</span><br><span class="line">    Addr:     addr,</span><br><span class="line">    Port:     port,</span><br><span class="line">    Protocol: <span class="string">&quot;tcp&quot;</span>,</span><br><span class="line">    Timeout:  <span class="number">30</span> * time.Second,</span><br><span class="line">    MaxConns: <span class="number">1000</span>,</span><br><span class="line">    TLS:      <span class="literal">nil</span>,</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 根据传入的函数，挨个渲染server</span></span><br><span class="line">  <span class="keyword">for</span> _, option := <span class="keyword">range</span> options &#123;</span><br><span class="line">    option(&amp;srv)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  <span class="keyword">return</span> &amp;srv, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 那么创建server对象的时候，可以调用如下，根据需要进行传参：</span></span><br><span class="line">s1, _ := NewServer(<span class="string">&quot;localhost&quot;</span>, <span class="number">1024</span>)</span><br><span class="line">s2, _ := NewServer(<span class="string">&quot;localhost&quot;</span>, <span class="number">2048</span>, Protocol(<span class="string">&quot;udp&quot;</span>))</span><br><span class="line">s3, _ := NewServer(<span class="string">&quot;0.0.0.0&quot;</span>, <span class="number">8080</span>, Timeout(<span class="number">300</span>*time.Second), MaxConns(<span class="number">1000</span>))</span><br></pre></td></tr></table></figure>
-
-
-
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/09/18/go-advanced/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
