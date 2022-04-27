@@ -388,9 +388,25 @@
 <p>II：根据是否可以登录（待斟酌）</p>
 <p>虚拟用户：不可登录，只能某些服务运行时使用？</p>
 <p>真实用户：可登录</p>
-<h4 id="2-2-切换用户"><a href="#2-2-切换用户" class="headerlink" title="2.2 切换用户"></a>2.2 切换用户</h4><p>//TODO：待补充</p>
-<p>su su -  sudo 等等</p>
-<p>wheel用户组？</p>
+<h4 id="2-2-切换用户"><a href="#2-2-切换用户" class="headerlink" title="2.2 切换用户"></a>2.2 切换用户</h4><p>I：sudo（super user do）</p>
+<p>暂时提权到root以执行某些命令，要执行的命令前加上sudo即可，需要输入当前用户的密码（也可以设置为不用输入密码），当然还有一个隐藏前提，即此用户拥有sudo 权限，如何获取sudo权限，后面再具体介绍。</p>
+<p>II：su（shift user）</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">su [用户名]</span><br></pre></td></tr></table></figure>
+
+<p>切换到其他用户，默认只是切换身份，并没有切换<strong>环境变量</strong>，需要输入切换后账号的密码，启动新的shell，以切换后账号身份运行，直到exit（root用户切换到其他任何用户都皆不用输入密码）</p>
+<p>如果su后面不跟用户名，默认切到root</p>
+<p>III：su -</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">su - [用户名]</span><br></pre></td></tr></table></figure>
+
+<p>切换到其他用户，切换用户身份的同时也切换环境变量，后面不加用户名则默认为root</p>
+<p>IV：sudo su   |   sudo su -</p>
+<p>即首先利用sudo提权到root用户，再su切到root用户，好处是不用输入root的密码，如果设置sudo不用输入当前用户密码的话，就可以直接切到root用户了</p>
+<p>然后我们来看一下普通用户如何才能有sudo权限，方法有三：</p>
+<p>I：用户添加到sudo用户组</p>
+<p>II：sudoers文件</p>
+<p>III： /etc/sudoers.d/ 目录</p>
+<p>详情见此链接<a href="https://p3terx.com/archives/linux-grants-normal-user-sudo-permission.html">Linux 中授予普通用户 sudo 权限的正确方法</a></p>
+<p>当然并不是所有用户都可以su | su - 切到root用户，若如此，root密码一旦泄露则任何用户都可切到root了，因此通过限制切到root的用户的权限以尽量降低可能降低的损失，具体权限管理通过wheel组，具体如链接所示<a href="https://www.cnblogs.com/kerrycode/p/7053118.html">linux下wheel用户组介绍</a></p>
 <h4 id="2-3-实际用户-有效用户"><a href="#2-3-实际用户-有效用户" class="headerlink" title="2.3 实际用户/有效用户"></a>2.3 实际用户/有效用户</h4><p><a href="http://wjhsh.net/keviwu-p-6104838.html">例子介绍</a></p>
 <h3 id="3-用户组"><a href="#3-用户组" class="headerlink" title="3. 用户组"></a>3. 用户组</h3><p>用户组同样具有名称和id两个属性，用户组id范围为：，同样0号是root用户组</p>
 <p>执行如下命令可显示当前用户的所有用户组（主组+附加组）</p>
