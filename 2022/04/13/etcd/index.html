@@ -23,15 +23,15 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","version":"8.2.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="neither supercilious nor obsequious">
+<meta name="description" content="一、使用场景1.1 主备切换1.1.1 流程介绍etcd自带concurrency介绍 1.1.2 代码示例(GO)1  1.1.3 point">
 <meta property="og:type" content="article">
 <meta property="og:title" content="etcd">
 <meta property="og:url" content="http://example.com/2022/04/13/etcd/index.html">
 <meta property="og:site_name" content="jjx">
-<meta property="og:description" content="neither supercilious nor obsequious">
+<meta property="og:description" content="一、使用场景1.1 主备切换1.1.1 流程介绍etcd自带concurrency介绍 1.1.2 代码示例(GO)1  1.1.3 point">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-04-13T11:50:18.000Z">
-<meta property="article:modified_time" content="2022-04-13T11:50:19.819Z">
+<meta property="article:modified_time" content="2022-05-04T15:46:40.688Z">
 <meta property="article:author" content="suki">
 <meta name="twitter:card" content="summary">
 
@@ -174,7 +174,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           Table of Contents
@@ -187,6 +187,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">一、使用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-%E4%B8%BB%E5%A4%87%E5%88%87%E6%8D%A2"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 主备切换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-1-%E6%B5%81%E7%A8%8B%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1.1 流程介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-2-%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B-GO"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.1.2 代码示例(GO)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-3-point"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.1.3 point</span></a></li></ol></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -202,7 +203,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-count">12</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -277,10 +278,16 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2022-04-13 19:50:18 / Modified: 19:50:19" itemprop="dateCreated datePublished" datetime="2022-04-13T19:50:18+08:00">2022-04-13</time>
+      <time title="Created: 2022-04-13 19:50:18" itemprop="dateCreated datePublished" datetime="2022-04-13T19:50:18+08:00">2022-04-13</time>
     </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">Edited on</span>
+        <time title="Modified: 2022-05-04 23:46:40" itemprop="dateModified" datetime="2022-05-04T23:46:40+08:00">2022-05-04</time>
+      </span>
 
   
     <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
@@ -299,7 +306,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        
+        <h1 id="一、使用场景"><a href="#一、使用场景" class="headerlink" title="一、使用场景"></a>一、使用场景</h1><h2 id="1-1-主备切换"><a href="#1-1-主备切换" class="headerlink" title="1.1 主备切换"></a>1.1 主备切换</h2><h3 id="1-1-1-流程介绍"><a href="#1-1-1-流程介绍" class="headerlink" title="1.1.1 流程介绍"></a>1.1.1 流程介绍</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/cyq6239075/article/details/109862443">etcd自带concurrency介绍</a></p>
+<h3 id="1-1-2-代码示例-GO"><a href="#1-1-2-代码示例-GO" class="headerlink" title="1.1.2 代码示例(GO)"></a>1.1.2 代码示例(GO)</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="1-1-3-point"><a href="#1-1-3-point" class="headerlink" title="1.1.3 point"></a>1.1.3 point</h3>
     </div>
 
     
