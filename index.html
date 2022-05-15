@@ -200,7 +200,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -213,7 +213,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -242,6 +242,73 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/15/linux-elf%E6%A0%BC%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/lay.gif">
+      <meta itemprop="name" content="suki">
+      <meta itemprop="description" content="neither supercilious nor obsequious">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jjx">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/05/15/linux-elf%E6%A0%BC%E5%BC%8F/" class="post-title-link" itemprop="url">linux-elf格式</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-05-15 15:45:47" itemprop="dateCreated datePublished" datetime="2022-05-15T15:45:47+08:00">2022-05-15</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          
+      
+    </div>
+
+    
+    
+    
+
+<div>
+    
+ </div>
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -282,7 +349,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">Edited on</span>
-        <time title="Modified: 2022-05-15 15:42:08" itemprop="dateModified" datetime="2022-05-15T15:42:08+08:00">2022-05-15</time>
+        <time title="Modified: 2022-05-15 15:47:35" itemprop="dateModified" datetime="2022-05-15T15:47:35+08:00">2022-05-15</time>
       </span>
 
   
@@ -298,167 +365,14 @@
           <h1 id="1-rpm简介"><a href="#1-rpm简介" class="headerlink" title="1. rpm简介"></a>1. rpm简介</h1><p> Redhat Package Manager，原本是RedHat Linux发行版用来管理Linux各项套件的软件，遵循GPL协议，因此在多种linux版本中都有采用。</p>
 <p>rpm使用命令可通过<code>rpm --help</code>获取，此处不再赘述，接下来将叙述rpm打包相关内容。</p>
 <h1 id="2-打包过程"><a href="#2-打包过程" class="headerlink" title="2. 打包过程"></a>2. 打包过程</h1><p>用到的软件是<code>rpmbuild</code>，<code>rpmbuild</code>通过软件包的SPEC描述文件生成rpm包，因此rpm打包的关键就在于SPEC描述文件。</p>
-<h2 id="2-1-打包目录"><a href="#2-1-打包目录" class="headerlink" title="2.1 打包目录"></a>2.1 打包目录</h2><p> rpm 打包目录有一些严格的层次上的要求。 </p>
-<p>rpm 的版本 &lt;=4.4.x，rpmbuid 工具其默认的工作路径是 <strong>/usr/src/redhat</strong> 因为权限的问题，普通用户不能制作 rpm 包，制作 rpm 软件包时必须切换到 <strong>root</strong> 身份才可以。</p>
-<p>rpm 从 4.5.x 版本开始，将 rpmbuid 的默认工作路径移动到用户家目录下的 rpmbuild 目录里，即 <strong>$HOME/rpmbuild</strong> ，并且推荐用户在制作 rpm 软件包时尽量不要以 root 身份进行操作。</p>
-<p>rpmbuild 默认工作路径的确定，通常由在 <strong>/usr/lib/rpm/macros</strong> 这个文件里的一个叫做 <strong>%_topdir</strong> 的宏变量来定义。如果用户想更改这个目录名，rpm 官方并不推荐直接更改这个目录，而是在用户家目录下建立一个名为 <strong>.rpmmacros</strong> 的隐藏文件 (Linux 下隐藏文件，前面的点不能少)，然后在里面重新定义 <strong>%_topdir</strong>，指向一个新的目录名。这样就可以满足某些用户的差异化需求了。通常情况下.rpmmacros 文件里一般只有一行内容，如：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">%</span><span class="bash">_topdir    <span class="variable">$HOME</span>/myrpmbuildenv</span> </span><br></pre></td></tr></table></figure>
-
-<p>在 %_topdir 目录下一般需要建立 6 个目录 </p>
-<table>
-<thead>
-<tr>
-<th>目录名</th>
-<th>说明</th>
-<th>macros 中的宏名</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>BUILD</td>
-<td>编译 rpm 包的临时目录</td>
-<td>%_builddir</td>
-</tr>
-<tr>
-<td>BUILDROOT</td>
-<td>编译后生成的软件临时安装目录</td>
-<td>%_buildrootdir</td>
-</tr>
-<tr>
-<td>RPMS</td>
-<td>最终生成的可安装 rpm 包的所在目录</td>
-<td>%_rpmdir</td>
-</tr>
-<tr>
-<td>SOURCES</td>
-<td>所有源代码和补丁文件的存放目录</td>
-<td>%_sourcedir</td>
-</tr>
-<tr>
-<td>SPECS</td>
-<td>存放 SPEC 文件的目录</td>
-<td>%_specdir</td>
-</tr>
-<tr>
-<td>SRPMS</td>
-<td>软件最终的 rpm 源码格式存放路径</td>
-<td>%_srcrpmdir</td>
-</tr>
-</tbody></table>
-<p>如果有安装 rpmdevtools，可以使用 rpmdev-setuptree 命令在当前用户 home/rpmbuild 目录里自动建立上述目录。</p>
-<h2 id="2-2-宏"><a href="#2-2-宏" class="headerlink" title="2.2 宏"></a>2.2 宏</h2><p>RPM通过宏定义一些目录路径及体系结构等，保存在<code>/usr/lib/rpm/macros</code>中</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">%</span><span class="bash">&#123;_sysconfdir&#125;        /etc</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_prefix&#125;            /usr</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_exec_prefix&#125;       %&#123;_prefix&#125;</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_bindir&#125;            %&#123;_exec_prefix&#125;/bin</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_lib&#125;               lib (lib64 on 64bit systems)</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_libdir&#125;            %&#123;_exec_prefix&#125;/%&#123;_lib&#125;</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_libexecdir&#125;        %&#123;_exec_prefix&#125;/libexec</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_sbindir&#125;           %&#123;_exec_prefix&#125;/sbin</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_sharedstatedir&#125;    /var/lib</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_datadir&#125;           %&#123;_prefix&#125;/share</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_includedir&#125;        %&#123;_prefix&#125;/include</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_oldincludedir&#125;     /usr/include</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_infodir&#125;           /usr/share/info</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_mandir&#125;            /usr/share/man</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_localstatedir&#125;     /var</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_initddir&#125;          %&#123;_sysconfdir&#125;/rc.d/init.d</span> </span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_topdir&#125;            %&#123;getenv:HOME&#125;/rpmbuild</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_builddir&#125;          %&#123;_topdir&#125;/BUILD</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_rpmdir&#125;            %&#123;_topdir&#125;/RPMS</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_sourcedir&#125;         %&#123;_topdir&#125;/SOURCES</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_specdir&#125;           %&#123;_topdir&#125;/SPECS</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_srcrpmdir&#125;         %&#123;_topdir&#125;/SRPMS</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_buildrootdir&#125;      %&#123;_topdir&#125;/BUILDROOT</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_var&#125;               /var</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_tmppath&#125;           %&#123;_var&#125;/tmp</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_usr&#125;               /usr</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_usrsrc&#125;            %&#123;_usr&#125;/src</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;_docdir&#125;            %&#123;_datadir&#125;/doc</span></span><br><span class="line"><span class="meta">%</span><span class="bash">&#123;buildroot&#125;          %&#123;_buildrootdir&#125;/%&#123;name&#125;-%&#123;version&#125;-%&#123;release&#125;.%&#123;_arch&#125;</span></span><br><span class="line"><span class="meta">$</span><span class="bash">RPM_BUILD_ROOT       %&#123;buildroot&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="2-3-SPEC文件"><a href="#2-3-SPEC文件" class="headerlink" title="2.3 SPEC文件"></a>2.3 SPEC文件</h2><p>文件内容可分为两部分：文件头以及内容。</p>
-<h3 id="2-3-1-文件头"><a href="#2-3-1-文件头" class="headerlink" title="2.3.1 文件头"></a>2.3.1 文件头</h3><p>文件头是一些基本信息的定义，如Name、Version等，这里的字段值在后面可通过%{name}、%{version}的形式引用。</p>
-<ul>
-<li>Summary</li>
-<li>Name</li>
-<li>Version</li>
-<li>Release</li>
-<li>Packager</li>
-<li>Vendor</li>
-<li>License</li>
-<li>Copyright</li>
-<li>Group</li>
-<li>Source</li>
-<li>BuildRequires</li>
-<li>Requires</li>
-<li>BuildRoot</li>
-<li>Prefix</li>
-<li>BuildArch</li>
-<li>description</li>
-<li>URL</li>
-</ul>
-<h3 id="2-3-2-主体"><a href="#2-3-2-主体" class="headerlink" title="2.3.2 主体"></a>2.3.2 主体</h3><ul>
-<li>%prep</li>
-</ul>
-<p>预处理阶段，通常是执行解压源程序包的命令</p>
-<p>一般包含%setup与%patch两个命令，%setup用于解压软件包，%patch用于将补丁文件加到解开的源程序中</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">%</span><span class="bash">setup -n %&#123;name&#125;-%&#123;version&#125;</span></span><br></pre></td></tr></table></figure>
-
-<p>就是将%sourcedir（<del>/rpmbuild/SOURCES）里的包解压到</del>/rpmbuild/BUILD/%{name}-%{version}中</p>
-<p>另外还有其他命令：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">%</span><span class="bash">setup 不加任何选项，仅将软件包打开。</span></span><br><span class="line"><span class="meta">%</span><span class="bash">setup -a 切换目录前，解压指定 Source 文件，例如 `-a 0` 表示解压 `Source0`</span></span><br><span class="line"><span class="meta">%</span><span class="bash">setup -n newdir 将软件包解压在newdir目录。</span></span><br><span class="line"><span class="meta">%</span><span class="bash">setup -c 解压缩之前先产生目录。</span></span><br><span class="line"><span class="meta">%</span><span class="bash">setup -b num 将第 num 个 <span class="built_in">source</span> 文件解压缩。</span></span><br><span class="line"><span class="meta">%</span><span class="bash">setup -D 解压前不删除目录</span></span><br><span class="line"><span class="meta">%</span><span class="bash">setup -T 不使用default的解压缩操作。</span></span><br><span class="line"><span class="meta">%</span><span class="bash">setup -T -b 0 将第 0 个源代码文件解压缩。</span></span><br><span class="line"><span class="meta">%</span><span class="bash">setup -c -n newdir 指定目录名称 newdir，并在此目录产生 rpm 套件。</span></span><br><span class="line"><span class="meta">%</span><span class="bash">patch 最简单的补丁方式，自动指定patch level。</span></span><br><span class="line"><span class="meta">%</span><span class="bash">patch 0 使用第0个补丁文件，相当于%patch ?p 0。</span></span><br><span class="line"><span class="meta">%</span><span class="bash">patch -s 不显示打补丁时的信息。</span></span><br><span class="line"><span class="meta">%</span><span class="bash">patch -T 将所有打补丁时产生的输出文件删除</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>%build</li>
-</ul>
-<p>在%_builddir目录下执行源码包的编译，一般是执行常见的<code>configure</code>和<code>make</code>命令</p>
-<ul>
-<li>%install</li>
-</ul>
-<p>将软件安装到虚拟目录中，在%buildrootdir目录下建好目录结构，将需要打包到rpm软件包里的文件从%builddir里拷贝到%_buildrootdir里对应的目录中</p>
-<p>通常执行<code>make install</code></p>
-<p>这部分的文件路径是绝对路径</p>
-<ul>
-<li><p>scripts</p>
-<ul>
-<li><p>%pre</p>
-</li>
-<li><p>%post</p>
-</li>
-<li><p>%preun</p>
-<p>卸载前执行（升级时会执行）</p>
-</li>
-<li><p>%postun</p>
-<p>卸载后执行（升级时不会执行）</p>
-</li>
-<li><p>%pretrans</p>
-</li>
-<li><p>%posttrans</p>
-</li>
-</ul>
-</li>
-<li><p>files</p>
-</li>
-</ul>
-<p>说明将%{buildroot}目录下的哪些文件和目录最终打包到rpm包里，这些文档分为三类：说明文档、配置文件以及执行程序，还可以定义文件存取权限、拥有者及属组</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">%</span><span class="bash">defattr (-,root,root,0755)  <span class="comment"># 设置默认权限设置</span></span></span><br><span class="line"><span class="meta">%</span><span class="bash">config [文件路径] <span class="comment"># %config表明是配置文件</span></span></span><br><span class="line"><span class="meta">%</span><span class="bash">doc</span></span><br><span class="line"><span class="meta">%</span><span class="bash">attr</span></span><br></pre></td></tr></table></figure>
-
-<p>注意：</p>
-<p>%{buildroot}里的所有文件/目录都要被明确指定是否要打包到rpm里，即需要被打包的要声明，不需要被打包的也要通过<code>%exclude</code>声明</p>
-<ul>
-<li>%clean</li>
-</ul>
-<p>编译后的一些清理工作</p>
-<ul>
-<li>%changelog</li>
-</ul>
-<p>记录spec的修改日志</p>
-<p><strong>附：</strong></p>
-<p>关于define和global的区别     —-&gt;  TO BE CONTINUED~</p>
-<h2 id="2-4-rpmbuild执行"><a href="#2-4-rpmbuild执行" class="headerlink" title="2.4 rpmbuild执行"></a>2.4 rpmbuild执行</h2><p>根据日志，涉及到的以下几个步骤会影响到二进制文件内容：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/usr/lib/rpm/redhat/brp-compress  </span><br><span class="line">/usr/lib/rpm/redhat/brp-strip /usr/bin/strip  </span><br><span class="line">/usr/lib/rpm/redhat/brp-strip-static-archive /usr/bin/strip  </span><br><span class="line">/usr/lib/rpm/redhat/brp-strip-comment-note /usr/bin/strip /usr/bin/objdump  </span><br></pre></td></tr></table></figure>
-
-<p><a target="_blank" rel="noopener" href="https://github.com/rpm-software-management/rpm/tree/master/scripts">rpm-software-management/rpm</a>中可找到脚本内容，</p>
-<ul>
-<li><code>brp-strip</code>用于去除elf二进制文件的debug信息，<code>brp-strip-static-archive</code>去除静态库中的debug信息：</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strip -g &lt;name&gt;</span><br></pre></td></tr></table></figure>
-
-<p>当然各语言在编译时也提供去除debug信息的命令，如go</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go build -ldflags &quot;-w&quot; -o name &lt;file&gt;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>brp-strip-comment-note</code>用于去除二进制文件中的某些section（此处去除的是.commnet以及.note）</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strip -R .comment -R .note &lt;name&gt;</span><br></pre></td></tr></table></figure>
-
-
-
-<p>如果说不希望rpmbuild去除信息，那么需要在spec文件中定义如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">%</span><span class="bash">define __strip /bin/<span class="literal">true</span> <span class="comment"># __strip是两个下划线</span></span></span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>参考：</strong></p>
-<ol>
-<li><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/michael-xiang/p/10480809.html">RPM包的构建-SPEC基础知识</a></p>
-</li>
-<li><p><a target="_blank" rel="noopener" href="https://my.oschina.net/u/913265/blog/892889">RPM包的制作</a></p>
-</li>
-</ol>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/05/14/Linux-rpm/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -519,7 +433,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">Edited on</span>
-        <time title="Modified: 2022-05-14 09:15:10" itemprop="dateModified" datetime="2022-05-14T09:15:10+08:00">2022-05-14</time>
+        <time title="Modified: 2022-05-15 15:45:00" itemprop="dateModified" datetime="2022-05-15T15:45:00+08:00">2022-05-15</time>
       </span>
 
   
@@ -536,19 +450,14 @@
 <p>（1）临时生效</p>
 <p>重启服务器或者网络，虚拟网卡消失</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 创建虚拟网卡：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> eth0:0  前者是物理网卡名称，后者是虚拟网卡编号，范围是0-255</span></span><br><span class="line">sudo ifconfig eth0:0 192.168.10.10 up</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除虚拟网卡</span></span><br><span class="line">sudo ifconfig eth0:0 down</span><br></pre></td></tr></table></figure>
-
-<p>（2）通过修改配置文件实现，命令如下：</p>
-<p>不同类型linux中有所不同， ubuntu下网卡的配置文件是<code>/etc/network/interfaces</code>，</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/network/interfaces</span><br><span class="line"><span class="meta">#</span><span class="bash"> 所有的网卡的配置都写在这一个文件里</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 重启网络，使之生效</span></span><br><span class="line">sudo /etc/init.d/networking restart</span><br></pre></td></tr></table></figure>
-
-<p>redhat中需要在<code>/etc/sysconfig/network-scripts</code>下创建对应的文件，如ifcfg-eth0:0，文件内容如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">DEVICE=eth0:0</span><br><span class="line">TYPE=Ethernet</span><br><span class="line">ONBOOT=yes</span><br><span class="line">NM_CONTROLLED=yes</span><br><span class="line">BOOTPROTO=none</span><br><span class="line">IPADDR=192.168.80.223</span><br><span class="line">PREFIX=24</span><br><span class="line">DEFROUTE=yes</span><br><span class="line">IPV4_FAILURE_FATAL=yes</span><br><span class="line">IPV6INIT=no</span><br><span class="line">NAME=&quot;System eth0:0&quot;</span><br><span class="line">HWADDR=00:0C:29:82:AA:8B</span><br></pre></td></tr></table></figure>
-
-<p>以上两种方法虚拟出的网卡与物理网卡Mac地址相同，如果想要不同，需创建tap，具体如下：</p>
-<p>（3）tap</p>
-<p>即通过软件模拟的网络设备，tap模拟了以太网设备</p>
-<p>具体介绍见<a target="_blank" rel="noopener" href="http://www.freeoa.net/osuport/netmanage/tun-tap-study-note_3411.html">虚拟网卡TUN TAP</a></p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/05/11/Linux-network/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1221,94 +1130,6 @@
             </div>
           <!--/noindex-->
         
-      
-    </div>
-
-    
-    
-    
-
-<div>
-    
- </div>
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/16/Fabric-java-sdk/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/lay.gif">
-      <meta itemprop="name" content="suki">
-      <meta itemprop="description" content="neither supercilious nor obsequious">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="jjx">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/03/16/Fabric-java-sdk/" class="post-title-link" itemprop="url">Fabric-java-sdk</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2021-03-16 23:39:44" itemprop="dateCreated datePublished" datetime="2021-03-16T23:39:44+08:00">2021-03-16</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">Edited on</span>
-        <time title="Modified: 2021-11-13 11:18:28" itemprop="dateModified" datetime="2021-11-13T11:18:28+08:00">2021-11-13</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Fabric/" itemprop="url" rel="index"><span itemprop="name">Fabric</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>获取channel对象</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 构建client</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建channel</span></span><br><span class="line"><span class="comment">// 1.</span></span><br><span class="line">client.newChannel()</span><br><span class="line">client.newChannel(String name) <span class="comment">// 只在client中创建一个channel对象，通常用于channel已在网络上存在的时候</span></span><br><span class="line">Peer peer = client.newPeer(<span class="string">&quot;peer1`&quot;</span>,<span class="string">&quot;grpc://127.0.0.1:7051&quot;</span>);</span><br><span class="line">channel.addPeer(peer);</span><br><span class="line">Orderer orderer = client.newOrderer(<span class="string">&quot;orderer1&quot;</span>,<span class="string">&quot;grpc://127.0.0.1:7050&quot;</span>);</span><br><span class="line">channel.addOrderer(orderer);</span><br><span class="line"><span class="comment">// 2.</span></span><br><span class="line">client.newChannel(String name, Orderer orderer, ChannelConfiguration channelConfiguration, <span class="keyword">byte</span>[]...)<span class="comment">// 向Orderer发送请求去创建channel</span></span><br><span class="line">    </span><br><span class="line">channel.initialize()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 查询交易</span></span><br><span class="line">TransactionInfo transactionInfo = channel.queryTransactionByID(<span class="string">&quot;&quot;</span>);</span><br><span class="line">Envelope envelope = transactionIndo.getTransactionEnvelope();</span><br><span class="line">ByteString byteString = envelope.getPayload()</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 通道对象已创建并且初始化，直接从client中获取，但必须先有上面的创建channel对象的步骤</span></span><br><span class="line">Channel channel = client.getChannel(<span class="string">&quot;name&quot;</span>)</span><br></pre></td></tr></table></figure>
-
-
       
     </div>
 

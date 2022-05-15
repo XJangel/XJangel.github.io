@@ -465,6 +465,8 @@
 <p>重启服务器或者网络，虚拟网卡消失</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 创建虚拟网卡：</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> eth0:0  前者是物理网卡名称，后者是虚拟网卡编号，范围是0-255</span></span><br><span class="line">sudo ifconfig eth0:0 192.168.10.10 up</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除虚拟网卡</span></span><br><span class="line">sudo ifconfig eth0:0 down</span><br></pre></td></tr></table></figure>
 
+<span id="more"></span>
+
 <p>（2）通过修改配置文件实现，命令如下：</p>
 <p>不同类型linux中有所不同， ubuntu下网卡的配置文件是<code>/etc/network/interfaces</code>，</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vim /etc/network/interfaces</span><br><span class="line"><span class="meta">#</span><span class="bash"> 所有的网卡的配置都写在这一个文件里</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 重启网络，使之生效</span></span><br><span class="line">sudo /etc/init.d/networking restart</span><br></pre></td></tr></table></figure>
@@ -484,6 +486,8 @@
     <content><![CDATA[<h1 id="1-rpm简介"><a href="#1-rpm简介" class="headerlink" title="1. rpm简介"></a>1. rpm简介</h1><p> Redhat Package Manager，原本是RedHat Linux发行版用来管理Linux各项套件的软件，遵循GPL协议，因此在多种linux版本中都有采用。</p>
 <p>rpm使用命令可通过<code>rpm --help</code>获取，此处不再赘述，接下来将叙述rpm打包相关内容。</p>
 <h1 id="2-打包过程"><a href="#2-打包过程" class="headerlink" title="2. 打包过程"></a>2. 打包过程</h1><p>用到的软件是<code>rpmbuild</code>，<code>rpmbuild</code>通过软件包的SPEC描述文件生成rpm包，因此rpm打包的关键就在于SPEC描述文件。</p>
+<span id="more"></span>
+
 <h2 id="2-1-打包目录"><a href="#2-1-打包目录" class="headerlink" title="2.1 打包目录"></a>2.1 打包目录</h2><p> rpm 打包目录有一些严格的层次上的要求。 </p>
 <p>rpm 的版本 &lt;=4.4.x，rpmbuid 工具其默认的工作路径是 <strong>/usr/src/redhat</strong> 因为权限的问题，普通用户不能制作 rpm 包，制作 rpm 软件包时必须切换到 <strong>root</strong> 身份才可以。</p>
 <p>rpm 从 4.5.x 版本开始，将 rpmbuid 的默认工作路径移动到用户家目录下的 rpmbuild 目录里，即 <strong>$HOME/rpmbuild</strong> ，并且推荐用户在制作 rpm 软件包时尽量不要以 root 身份进行操作。</p>
@@ -646,7 +650,13 @@
 </ol>
 ]]></content>
       <tags>
-        <tag>linux,rpm</tag>
+        <tag>linux</tag>
+        <tag>rpm</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>linux-elf格式</title>
+    <url>/2022/05/15/linux-elf%E6%A0%BC%E5%BC%8F/</url>
+    <content><![CDATA[]]></content>
   </entry>
 </search>
