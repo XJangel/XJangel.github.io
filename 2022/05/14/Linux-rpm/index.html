@@ -31,7 +31,7 @@
 <meta property="og:description" content="1. rpm简介 Redhat Package Manager，原本是RedHat Linux发行版用来管理Linux各项套件的软件，遵循GPL协议，因此在多种linux版本中都有采用。 rpm使用命令可通过rpm --help获取，此处不再赘述，接下来将叙述rpm打包相关内容。 2. 打包过程用到的软件是rpmbuild，rpmbuild通过软件包的SPEC描述文件生成rpm包，因此rpm打包的">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-05-14T01:13:51.000Z">
-<meta property="article:modified_time" content="2022-05-15T07:40:10.390Z">
+<meta property="article:modified_time" content="2022-05-15T07:42:08.321Z">
 <meta property="article:author" content="suki">
 <meta property="article:tag" content="linux,rpm">
 <meta name="twitter:card" content="summary">
@@ -287,7 +287,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">Edited on</span>
-        <time title="Modified: 2022-05-15 15:40:10" itemprop="dateModified" datetime="2022-05-15T15:40:10+08:00">2022-05-15</time>
+        <time title="Modified: 2022-05-15 15:42:08" itemprop="dateModified" datetime="2022-05-15T15:42:08+08:00">2022-05-15</time>
       </span>
 
   
@@ -438,7 +438,7 @@
 </ul>
 <p>记录spec的修改日志</p>
 <p><strong>附：</strong></p>
-<p>关于define和global的区别</p>
+<p>关于define和global的区别     —-&gt;  TO BE CONTINUED~</p>
 <h2 id="2-4-rpmbuild执行"><a href="#2-4-rpmbuild执行" class="headerlink" title="2.4 rpmbuild执行"></a>2.4 rpmbuild执行</h2><p>根据日志，涉及到的以下几个步骤会影响到二进制文件内容：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/usr/lib/rpm/redhat/brp-compress  </span><br><span class="line">/usr/lib/rpm/redhat/brp-strip /usr/bin/strip  </span><br><span class="line">/usr/lib/rpm/redhat/brp-strip-static-archive /usr/bin/strip  </span><br><span class="line">/usr/lib/rpm/redhat/brp-strip-comment-note /usr/bin/strip /usr/bin/objdump  </span><br></pre></td></tr></table></figure>
 

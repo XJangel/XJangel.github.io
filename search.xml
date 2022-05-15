@@ -612,7 +612,7 @@
 </ul>
 <p>记录spec的修改日志</p>
 <p><strong>附：</strong></p>
-<p>关于define和global的区别</p>
+<p>关于define和global的区别     —-&gt;  TO BE CONTINUED~</p>
 <h2 id="2-4-rpmbuild执行"><a href="#2-4-rpmbuild执行" class="headerlink" title="2.4 rpmbuild执行"></a>2.4 rpmbuild执行</h2><p>根据日志，涉及到的以下几个步骤会影响到二进制文件内容：</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">/usr/lib/rpm/redhat/brp-compress  </span><br><span class="line">/usr/lib/rpm/redhat/brp-strip /usr/bin/strip  </span><br><span class="line">/usr/lib/rpm/redhat/brp-strip-static-archive /usr/bin/strip  </span><br><span class="line">/usr/lib/rpm/redhat/brp-strip-comment-note /usr/bin/strip /usr/bin/objdump  </span><br></pre></td></tr></table></figure>
 
