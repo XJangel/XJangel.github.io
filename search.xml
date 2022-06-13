@@ -674,10 +674,41 @@
   <entry>
     <title>linux-elf格式</title>
     <url>/2022/05/15/linux-elf%E6%A0%BC%E5%BC%8F/</url>
-    <content><![CDATA[]]></content>
+    <content><![CDATA[<h1 id="1-背景"><a href="#1-背景" class="headerlink" title="1. 背景"></a>1. 背景</h1><p> Executable and Linkable Format</p>
+<p><a href="https://xinqiu.gitbooks.io/linux-inside-zh/content/Theory/linux-theory-2.html">ELF文件格式</a></p>
+]]></content>
       <tags>
         <tag>Linux</tag>
         <tag>elf</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>GO-IO</title>
+    <url>/2022/06/13/GO-IO/</url>
+    <content><![CDATA[<h1 id="1-go-io"><a href="#1-go-io" class="headerlink" title="1. go-io"></a>1. go-io</h1><p>io.go</p>
+<p>定义基础接口，如下列等：</p>
+<ul>
+<li>reader</li>
+<li>writer</li>
+<li>closer</li>
+<li>ReadWriter</li>
+<li>ReadCloser</li>
+<li>WriteCloser</li>
+<li>ReadWriteCloser</li>
+</ul>
+<p>io.copy(dst writer, src reader)</p>
+<p>以固定大小的缓冲(默认32*1024)循环操作，因此读取大文件时常用，不会一下子内存打满</p>
+<p>接口的标准实现：</p>
+<p>strings.NewReader()       -&gt;io.Reader</p>
+<p>bytes.Buffer    -&gt; read write</p>
+<p>os.File</p>
+<p>io.Pipe  管道，一端写入，一端读出</p>
+<p>缓冲区io：bufio</p>
+<p>ioutil</p>
+]]></content>
+      <tags>
+        <tag>GO</tag>
+        <tag>IO</tag>
       </tags>
   </entry>
 </search>
