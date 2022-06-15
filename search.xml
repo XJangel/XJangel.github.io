@@ -685,8 +685,7 @@
   <entry>
     <title>GO-IO</title>
     <url>/2022/06/13/GO-IO/</url>
-    <content><![CDATA[<h1 id="1-go-io"><a href="#1-go-io" class="headerlink" title="1. go-io"></a>1. go-io</h1><p>io.go</p>
-<p>定义基础接口，如下列等：</p>
+    <content><![CDATA[<h2 id="1-基础接口"><a href="#1-基础接口" class="headerlink" title="1. 基础接口"></a>1. 基础接口</h2><p><a href="https://books.studygolang.com/The-Golang-Standard-Library-by-Example/chapter01/01.1.html">基础接口</a>，如下列等：</p>
 <ul>
 <li>reader</li>
 <li>writer</li>
@@ -698,13 +697,47 @@
 </ul>
 <p>io.copy(dst writer, src reader)</p>
 <p>以固定大小的缓冲(默认32*1024)循环操作，因此读取大文件时常用，不会一下子内存打满</p>
-<p>接口的标准实现：</p>
-<p>strings.NewReader()       -&gt;io.Reader</p>
+<p>根据不同输入设置的reader：</p>
+<p>strings.NewReader()       -&gt;strings.Reader   只实现了基本的reader接口中的方法</p>
+<p><strong>bufio</strong></p>
+<ul>
+<li><p>NewReader(io.Reader)</p>
+<p>提供多种数据读取方式，如ReadSlice、ReadBytes、ReadString 和 ReadLine 方法,后三个方法都是调用ReadSlice实现</p>
+</li>
+<li><p>NewWriter(io.Writer)</p>
+<ul>
+<li>Flush()  缓存写入io.Writer中</li>
+</ul>
+</li>
+<li><p>NewReadWriter(io.Reader, io.Writer)</p>
+</li>
+<li><p>Peek()</p>
+</li>
+<li><p>NewScanner(io.Reader)    每次读取一行</p>
+</li>
+</ul>
 <p>bytes.Buffer    -&gt; read write</p>
+<p><a href="https://organicprogrammer.com/2021/04/04/golang-bytes-buffer/">bytes.Buffer对比bufio</a></p>
 <p>os.File</p>
-<p>io.Pipe  管道，一端写入，一端读出</p>
-<p>缓冲区io：bufio</p>
-<p>ioutil</p>
+<p>io.Pipe  管道，一端写入，一端读出：写完close后才能开始读</p>
+<h2 id="2-ioutil"><a href="#2-ioutil" class="headerlink" title="2. ioutil"></a>2. ioutil</h2><ul>
+<li><p>NopCloser(io.Reader)</p>
+<p>将io.Reader包装为io.ReadCloser，实现为封装io.Reader，同时实现Close方法（空方法，do nothing）</p>
+</li>
+<li><p>ReadAll(io.Reader)</p>
+<p>从reader中读取所有数据</p>
+</li>
+<li><p>ReadDir(string)</p>
+<p> 它读取目录并返回排好序的文件和子目录名 </p>
+</li>
+<li><p>ReadFile(string)</p>
+<p>类似于ReadAll，读取所有内容</p>
+</li>
+<li><p>TempDir  TempFile</p>
+</li>
+<li><p>Discard</p>
+</li>
+</ul>
 ]]></content>
       <tags>
         <tag>GO</tag>
