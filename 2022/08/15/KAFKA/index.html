@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","version":"8.2.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="1.简介三个关键功能：  发布（写入）和订阅（读取）事件流，包括从其他系统持续导入&#x2F;导出数据 。 根据需要持久可靠地 存储事件流。 在事件发生时或回顾性 地处理事件流。  疑问： 生产者一旦写入就会持久存储，消费后也不会删除，直到设置的过期时间 同一份数据是否可被多个消费者同时消费，那么各消费者之间的关系又是什么？互不影响，甚至感知不到其他消费者的存在？ 对某个topic来说，多生产者   多消费">
+<meta property="og:type" content="article">
+<meta property="og:title" content="KAFKA">
+<meta property="og:url" content="http://example.com/2022/08/15/KAFKA/index.html">
+<meta property="og:site_name" content="jjx">
+<meta property="og:description" content="1.简介三个关键功能：  发布（写入）和订阅（读取）事件流，包括从其他系统持续导入&#x2F;导出数据 。 根据需要持久可靠地 存储事件流。 在事件发生时或回顾性 地处理事件流。  疑问： 生产者一旦写入就会持久存储，消费后也不会删除，直到设置的过期时间 同一份数据是否可被多个消费者同时消费，那么各消费者之间的关系又是什么？互不影响，甚至感知不到其他消费者的存在？ 对某个topic来说，多生产者   多消费">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-08-15T13:37:55.000Z">
+<meta property="article:modified_time" content="2022-08-17T14:39:56.444Z">
+<meta property="article:author" content="suki">
+<meta property="article:tag" content="KAFKA">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2022/08/15/KAFKA/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<title>KAFKA | jjx</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">jjx</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">to record everything meaningful</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">1.简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E9%83%A8%E7%BD%B2%E6%9E%B6%E6%9E%84%E5%8F%8A%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">2. 部署架构及概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E6%A8%A1%E5%9D%97%E4%BB%8B%E7%BB%8D"><span class="nav-number">3.</span> <span class="nav-text">3.模块介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-producer"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 producer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E9%9B%B6%E6%95%A3%E6%80%BB%E7%BB%93"><span class="nav-number">3.2.</span> <span class="nav-text">其他零散总结</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="suki"
+      src="/images/lay.gif">
+  <p class="site-author-name" itemprop="name">suki</p>
+  <div class="site-description" itemprop="description">neither supercilious nor obsequious</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/15/KAFKA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/lay.gif">
+      <meta itemprop="name" content="suki">
+      <meta itemprop="description" content="neither supercilious nor obsequious">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jjx">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          KAFKA
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-08-15 21:37:55" itemprop="dateCreated datePublished" datetime="2022-08-15T21:37:55+08:00">2022-08-15</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">Edited on</span>
+        <time title="Modified: 2022-08-17 22:39:56" itemprop="dateModified" datetime="2022-08-17T22:39:56+08:00">2022-08-17</time>
+      </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="1-简介"><a href="#1-简介" class="headerlink" title="1.简介"></a>1.简介</h1><p>三个关键功能：</p>
+<ol>
+<li><strong>发布</strong>（写入）和<strong>订阅</strong>（读取）事件流，包括从其他系统持续导入/导出数据 。</li>
+<li>根据需要持久可靠地 <strong>存储事件流。</strong></li>
+<li>在事件发生时或回顾性 地<strong>处理事件流。</strong></li>
+</ol>
+<p><strong>疑问：</strong></p>
+<p>生产者一旦写入就会持久存储，消费后也不会删除，直到设置的过期时间</p>
+<p>同一份数据是否可被多个消费者同时消费，那么各消费者之间的关系又是什么？互不影响，甚至感知不到其他消费者的存在？</p>
+<p>对某个topic来说，多生产者   多消费者</p>
+<p>kafka的性能是恒定的，与数据大小无关</p>
+<p>能够保证给定topic分区的任务消费者都能以与事件写入完全相同的顺序读取该分区的事件</p>
+<h1 id="2-部署架构及概念"><a href="#2-部署架构及概念" class="headerlink" title="2. 部署架构及概念"></a>2. 部署架构及概念</h1><p>server———-(tcp)——————-client</p>
+<p>kafka 管理API</p>
+<p>生产者API</p>
+<p>消费者API</p>
+<p>kafka connect API</p>
+<p>data source&lt;———-&gt;kafka connect&lt;————–&gt;kakfa&lt;————&gt;kafka connect&lt;————&gt;data source</p>
+<p>标准化与现有其他数据系统的集成，简化连接器的开发、部署和管理</p>
+<p>kafka stream API</p>
+<p>broker：kafka实例</p>
+<p>partition：</p>
+<p>一个topic可以有多个分区，一个分区可以由多个副分区。</p>
+<p>每个记录由键值以及时间戳组成</p>
+<p>默认情况下，通过轮询将消息发送到不同的分区上；在某些情况下，生产者会把消息直接写到特定的分区，通常通过消息键和分区器来实现，分区器为键生成一个散列值，并将其映射到指定分区，可以保证同样的键映射到同一个分区上（有什么应用场景？）</p>
+<p>生产者也可以自定义分区器，根据不同的业务规则将消息映射到分区（为什么要这么做？应用场景？）</p>
+<p>同一个topic可以被多个消费者消费，消费者把每个分区最后读取的消息偏移量保存到zookeeper或者kafka上，那么是否支持多个消费者消费同一个分区？如果支持，那么偏移量是消费者级别的？也就是说针对每个消费者都会记录一个偏移量？不然不同消费者不同的消费速度如何区分？</p>
+<p>还有一点，不同分区的数据应该是不一样的，那么消费者必须消费所有分区才能处理所有数据，那么消费者组概念随着而出？</p>
+<p>partition的数量与topic绑定？不同topic的partition任意设定？</p>
+<p>无法整个topic范围内保证消息的顺序，只能保证单个分区下的消息顺序，需要严格保证消息顺序的话，需要将partition设为1</p>
+<p>通过partition实现数据冗余和伸缩，数据冗余表现在同一个partition可以有多个复制品</p>
+<p>每个partition会有一份或多份数据保存，当有多份数据时，会有一个首领副本，首领副本负责消息的读写处理，其他副本只是从首领副本复制消息，不参与请求处理，若首领副本down掉，会重新选举首领副本，那么原首领副本上线后作为其他副本是否会将现首领副本的消息同步过来</p>
+<p>生产者消息offset</p>
+<p>消费者消息offset</p>
+<h1 id="3-模块介绍"><a href="#3-模块介绍" class="headerlink" title="3.模块介绍"></a>3.模块介绍</h1><h2 id="3-1-producer"><a href="#3-1-producer" class="headerlink" title="3.1 producer"></a>3.1 producer</h2><p>go sarama</p>
+<ul>
+<li><p>同步生产者</p>
+<p>每发送一条消息，需要等待返回结果才能继续发送</p>
+</li>
+<li><p>异步生产者</p>
+<p>通过channel进行消息的发送和结果的接收，性能高</p>
+</li>
+</ul>
+<p>异步生产者API的使用：</p>
+<p>（1）创建一个AsyncProducer对象</p>
+<p>（2）往producer中发消息</p>
+<p>（3）异步获取失败或成功消息</p>
+<p>同步生产者只是在异步生产者之上封装了一层</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> syncProducer <span class="keyword">struct</span> &#123;</span><br><span class="line">    producer *asyncProducer</span><br><span class="line">    wg       sync.WaitGroup</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来分析异步生产者流程：</p>
+<p><a target="_blank" rel="noopener" href="https://www.lixueduan.com/posts/kafka/06-sarama-producer/">https://www.lixueduan.com/posts/kafka/06-sarama-producer/</a></p>
+<h2 id="其他零散总结"><a href="#其他零散总结" class="headerlink" title="其他零散总结"></a>其他零散总结</h2><p>消息传递模式：</p>
+<ul>
+<li><p>点对点</p>
+<p>同步</p>
+</li>
+<li><p>发布-订阅</p>
+<p>异步</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+<div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文结束------</div>
+    
+</div>
+    
+ </div>
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/KAFKA/" rel="tag"># KAFKA</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/07/04/TLS/" rel="prev" title="TLS">
+                  <i class="fa fa-chevron-left"></i> TLS
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/09/07/pprof/" rel="next" title="pprof">
+                  pprof <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">suki</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

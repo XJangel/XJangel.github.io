@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","version":"8.2.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="1. 初识profiling，程序执行过程中，收集能够反映程序运行状态的数据，是一种动态研究程序行为的方法 go自带的pprof库可以用来分析程序的运行情况，包括两种：  runtime&#x2F;pprof  运行时间一定  net&#x2F;http&#x2F;pprof  一直运行以提供服务 实际上也是调用runtime&#x2F;pprof，封装成接口提供网络访问 pprof可提供性能数据：  allocs  内存分配  blo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pprof">
+<meta property="og:url" content="http://example.com/2022/09/07/pprof/index.html">
+<meta property="og:site_name" content="jjx">
+<meta property="og:description" content="1. 初识profiling，程序执行过程中，收集能够反映程序运行状态的数据，是一种动态研究程序行为的方法 go自带的pprof库可以用来分析程序的运行情况，包括两种：  runtime&#x2F;pprof  运行时间一定  net&#x2F;http&#x2F;pprof  一直运行以提供服务 实际上也是调用runtime&#x2F;pprof，封装成接口提供网络访问 pprof可提供性能数据：  allocs  内存分配  blo">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-09-07T15:12:39.000Z">
+<meta property="article:modified_time" content="2022-09-07T16:06:23.963Z">
+<meta property="article:author" content="suki">
+<meta property="article:tag" content="go">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2022/09/07/pprof/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<title>pprof | jjx</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">jjx</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">to record everything meaningful</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E5%88%9D%E8%AF%86"><span class="nav-number">1.</span> <span class="nav-text">1. 初识</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">2. 使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-runtime-pprof"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 runtime&#x2F;pprof</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-net-http-pprof"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 net&#x2F;http&#x2F;pprof</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">3. 数据分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%E4%BA%A4%E4%BA%92%E5%BC%8F"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 交互式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-ui"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 ui</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%E5%AE%9E%E6%88%98"><span class="nav-number">4.</span> <span class="nav-text">4. 实战</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="suki"
+      src="/images/lay.gif">
+  <p class="site-author-name" itemprop="name">suki</p>
+  <div class="site-description" itemprop="description">neither supercilious nor obsequious</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/07/pprof/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/lay.gif">
+      <meta itemprop="name" content="suki">
+      <meta itemprop="description" content="neither supercilious nor obsequious">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="jjx">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          pprof
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-09-07 23:12:39" itemprop="dateCreated datePublished" datetime="2022-09-07T23:12:39+08:00">2022-09-07</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">Edited on</span>
+        <time title="Modified: 2022-09-08 00:06:23" itemprop="dateModified" datetime="2022-09-08T00:06:23+08:00">2022-09-08</time>
+      </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="1-初识"><a href="#1-初识" class="headerlink" title="1. 初识"></a>1. 初识</h1><p>profiling，程序执行过程中，收集能够反映程序运行状态的数据，是一种动态研究程序行为的方法</p>
+<p>go自带的pprof库可以用来分析程序的运行情况，包括两种：</p>
+<ul>
+<li>runtime/pprof</li>
+</ul>
+<p>运行时间一定</p>
+<ul>
+<li>net/http/pprof</li>
+</ul>
+<p>一直运行以提供服务</p>
+<p>实际上也是调用runtime/pprof，封装成接口提供网络访问</p>
+<p>pprof可提供性能数据：</p>
+<ul>
+<li>allocs</li>
+</ul>
+<p>内存分配</p>
+<ul>
+<li>blocks</li>
+</ul>
+<p>阻塞操作</p>
+<ul>
+<li>cmdline</li>
+</ul>
+<p>显示程序启动命令及参数</p>
+<ul>
+<li>goroutine</li>
+</ul>
+<p>当前所有协程的堆栈信息</p>
+<ul>
+<li>heap</li>
+</ul>
+<p>堆上内存</p>
+<ul>
+<li>mutex</li>
+</ul>
+<p>锁争用情况</p>
+<ul>
+<li>profile</li>
+</ul>
+<p>cpu占用情况</p>
+<ul>
+<li>threadcreate</li>
+</ul>
+<p>系统线程创建情况</p>
+<ul>
+<li>trace</li>
+</ul>
+<p>程序运行追踪信息</p>
+<p>备注：</p>
+<p><code>allocs</code>和<code>heap</code>采样信息一致，不过前者是所有对象的内存分配，后者是活跃对象的内存分配    （何为活跃对象？）</p>
+<h1 id="2-使用"><a href="#2-使用" class="headerlink" title="2. 使用"></a>2. 使用</h1><h2 id="2-1-runtime-pprof"><a href="#2-1-runtime-pprof" class="headerlink" title="2.1 runtime/pprof"></a>2.1 runtime/pprof</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">&quot;runtime/pprof&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> cpuprofile = flag.String(<span class="string">&quot;cpuprofile&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;write cpu profile to file&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// …………</span></span><br><span class="line">        </span><br><span class="line">    pprof.StartCPUProfile(f)  <span class="comment">// 启动cpu profiling</span></span><br><span class="line">    <span class="keyword">defer</span> pprof.StopCPUProfile()  <span class="comment">// 将数据刷新到文件里</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// …………</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>类似的还有启动内存profile等等</p>
+<h2 id="2-2-net-http-pprof"><a href="#2-2-net-http-pprof" class="headerlink" title="2.2 net/http/pprof"></a>2.2 net/http/pprof</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> _ <span class="string">&quot;net/http/pprof&quot;</span>  <span class="comment">// 重点</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">initPprofMonitor</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	pPort := global.Conf.MustInt(<span class="string">&quot;http_server&quot;</span>, <span class="string">&quot;pprofport&quot;</span>, <span class="number">8080</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> err error</span><br><span class="line">	addr := <span class="string">&quot;:&quot;</span> + strconv.Itoa(pPort)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		err = http.ListenAndServe(addr, <span class="literal">nil</span>)   <span class="comment">// 启动端口监听</span></span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			logger.Error(<span class="string">&quot;funcRetErr=http.ListenAndServe||err=%s&quot;</span>, err.Error())</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>pprof会自动注册handler，处理相关请求</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/net/http/pprof/pprof.go:71</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	http.Handle(<span class="string">&quot;/debug/pprof/&quot;</span>, http.HandlerFunc(Index))</span><br><span class="line">	http.Handle(<span class="string">&quot;/debug/pprof/cmdline&quot;</span>, http.HandlerFunc(Cmdline))</span><br><span class="line">	http.Handle(<span class="string">&quot;/debug/pprof/profile&quot;</span>, http.HandlerFunc(Profile))</span><br><span class="line">	http.Handle(<span class="string">&quot;/debug/pprof/symbol&quot;</span>, http.HandlerFunc(Symbol))</span><br><span class="line">	http.Handle(<span class="string">&quot;/debug/pprof/trace&quot;</span>, http.HandlerFunc(Trace))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 第一个路径 <code>/debug/pprof/</code> 下面其实还有 5 个子路径： </p>
+<p>goroutine<br>threadcreate<br>heap<br>block<br>mutex </p>
+<p>启动服务后，可以直接在浏览器中访问：</p>
+<p><a href="http://ip:port/debug/pprof">http://ip:port/debug/pprof</a></p>
+<p>得到汇总页面</p>
+<p>可以直接点击上面的链接，进入子页面，查看相关的汇总信息。</p>
+<p>关于 goroutine 的信息有两个链接，<code>goroutine</code> 和 <code>full goroutine stack dump</code>，前者是一个汇总的消息，可以查看 goroutines 的总体情况，后者则可以看到每一个 goroutine 的状态。页面具体内容的解读可以参考【大彬】的文章。</p>
+<p>点击 <code>profile</code> 和 <code>trace</code> 则会在后台进行一段时间的数据采样，采样完成后，返回给浏览器一个 profile 文件，之后在本地通过 <code>go tool pprof</code> 工具进行分析。</p>
+<h1 id="3-数据分析"><a href="#3-数据分析" class="headerlink" title="3. 数据分析"></a>3. 数据分析</h1><h2 id="3-1-交互式"><a href="#3-1-交互式" class="headerlink" title="3.1 交互式"></a>3.1 交互式</h2><p>进入交互模式的命令有下面两种：</p>
+<ol>
+<li>已获取运行数据的情况下，比如使用runtime/pprof，程序执行结束后会将数据写入文件；或者2.2章节中提到的汇总页面点击某一项会进行一段时间的数据采集并生成文件</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go tool pprof 文件路径  </span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>直接从http server中获取数据并分析</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">go tool pprof http://ip:port/debug/pprof/[选填]</span><br><span class="line"><span class="meta">#</span><span class="bash"> cpu,默认从当前开始收集30s</span></span><br><span class="line">go tool pprof http://ip:port/debug/pprof/profile</span><br><span class="line"><span class="meta">#</span><span class="bash"> cpu 自定义时间</span></span><br><span class="line">go tool pprof http://ip:port/debug/pprof/profile?seconds=120</span><br><span class="line"><span class="meta">#</span><span class="bash"> heap</span></span><br><span class="line">go tool pprof http://ip:port/debug/pprof/heap</span><br><span class="line"><span class="meta">#</span><span class="bash"> gorouine</span></span><br><span class="line">go tool pprof http://ip:port/debug/pprof/goroutine</span><br><span class="line"><span class="meta">#</span><span class="bash"> block</span></span><br><span class="line">go tool pprof http://ip:port/debug/pprof/block</span><br><span class="line"><span class="meta">#</span><span class="bash"> mutex</span></span><br><span class="line">go tool pprof http://ip:port/debug/pprof/mutex</span><br></pre></td></tr></table></figure>
+
+<p>进入交互模式后，常用命令有top、list、web等</p>
+<ul>
+<li>top</li>
+</ul>
+<p>得到几列数据</p>
+<ul>
+<li>list</li>
+</ul>
+<p>使用正则比配，查看某个函数的代码</p>
+<ul>
+<li>web</li>
+</ul>
+<p>需要安装graphviz</p>
+<p>图展示</p>
+<ul>
+<li>traces</li>
+</ul>
+<p>列出函数调用栈</p>
+<h2 id="3-2-ui"><a href="#3-2-ui" class="headerlink" title="3.2 ui"></a>3.2 ui</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go tool pprof --http=:8080 数据文件或者server地址</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-实战"><a href="#4-实战" class="headerlink" title="4. 实战"></a>4. 实战</h1><p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000019222661">go内存泄漏</a></p>
+
+    </div>
+
+    
+    
+    
+
+<div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文结束------</div>
+    
+</div>
+    
+ </div>
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/08/15/KAFKA/" rel="prev" title="KAFKA">
+                  <i class="fa fa-chevron-left"></i> KAFKA
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/11/27/jwt/" rel="next" title="jwt">
+                  jwt <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">suki</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

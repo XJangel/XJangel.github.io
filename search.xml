@@ -804,4 +804,232 @@
 <p>Java中的并发？</p>
 ]]></content>
   </entry>
+  <entry>
+    <title>KAFKA</title>
+    <url>/2022/08/15/KAFKA/</url>
+    <content><![CDATA[<h1 id="1-简介"><a href="#1-简介" class="headerlink" title="1.简介"></a>1.简介</h1><p>三个关键功能：</p>
+<ol>
+<li><strong>发布</strong>（写入）和<strong>订阅</strong>（读取）事件流，包括从其他系统持续导入/导出数据 。</li>
+<li>根据需要持久可靠地 <strong>存储事件流。</strong></li>
+<li>在事件发生时或回顾性 地<strong>处理事件流。</strong></li>
+</ol>
+<p><strong>疑问：</strong></p>
+<p>生产者一旦写入就会持久存储，消费后也不会删除，直到设置的过期时间</p>
+<p>同一份数据是否可被多个消费者同时消费，那么各消费者之间的关系又是什么？互不影响，甚至感知不到其他消费者的存在？</p>
+<p>对某个topic来说，多生产者   多消费者</p>
+<p>kafka的性能是恒定的，与数据大小无关</p>
+<p>能够保证给定topic分区的任务消费者都能以与事件写入完全相同的顺序读取该分区的事件</p>
+<h1 id="2-部署架构及概念"><a href="#2-部署架构及概念" class="headerlink" title="2. 部署架构及概念"></a>2. 部署架构及概念</h1><p>server———-(tcp)——————-client</p>
+<p>kafka 管理API</p>
+<p>生产者API</p>
+<p>消费者API</p>
+<p>kafka connect API</p>
+<p>data source&lt;———-&gt;kafka connect&lt;————–&gt;kakfa&lt;————&gt;kafka connect&lt;————&gt;data source</p>
+<p>标准化与现有其他数据系统的集成，简化连接器的开发、部署和管理</p>
+<p>kafka stream API</p>
+<p>broker：kafka实例</p>
+<p>partition：</p>
+<p>一个topic可以有多个分区，一个分区可以由多个副分区。</p>
+<p>每个记录由键值以及时间戳组成</p>
+<p>默认情况下，通过轮询将消息发送到不同的分区上；在某些情况下，生产者会把消息直接写到特定的分区，通常通过消息键和分区器来实现，分区器为键生成一个散列值，并将其映射到指定分区，可以保证同样的键映射到同一个分区上（有什么应用场景？）</p>
+<p>生产者也可以自定义分区器，根据不同的业务规则将消息映射到分区（为什么要这么做？应用场景？）</p>
+<p>同一个topic可以被多个消费者消费，消费者把每个分区最后读取的消息偏移量保存到zookeeper或者kafka上，那么是否支持多个消费者消费同一个分区？如果支持，那么偏移量是消费者级别的？也就是说针对每个消费者都会记录一个偏移量？不然不同消费者不同的消费速度如何区分？</p>
+<p>还有一点，不同分区的数据应该是不一样的，那么消费者必须消费所有分区才能处理所有数据，那么消费者组概念随着而出？</p>
+<p>partition的数量与topic绑定？不同topic的partition任意设定？</p>
+<p>无法整个topic范围内保证消息的顺序，只能保证单个分区下的消息顺序，需要严格保证消息顺序的话，需要将partition设为1</p>
+<p>通过partition实现数据冗余和伸缩，数据冗余表现在同一个partition可以有多个复制品</p>
+<p>每个partition会有一份或多份数据保存，当有多份数据时，会有一个首领副本，首领副本负责消息的读写处理，其他副本只是从首领副本复制消息，不参与请求处理，若首领副本down掉，会重新选举首领副本，那么原首领副本上线后作为其他副本是否会将现首领副本的消息同步过来</p>
+<p>生产者消息offset</p>
+<p>消费者消息offset</p>
+<h1 id="3-模块介绍"><a href="#3-模块介绍" class="headerlink" title="3.模块介绍"></a>3.模块介绍</h1><h2 id="3-1-producer"><a href="#3-1-producer" class="headerlink" title="3.1 producer"></a>3.1 producer</h2><p>go sarama</p>
+<ul>
+<li><p>同步生产者</p>
+<p>每发送一条消息，需要等待返回结果才能继续发送</p>
+</li>
+<li><p>异步生产者</p>
+<p>通过channel进行消息的发送和结果的接收，性能高</p>
+</li>
+</ul>
+<p>异步生产者API的使用：</p>
+<p>（1）创建一个AsyncProducer对象</p>
+<p>（2）往producer中发消息</p>
+<p>（3）异步获取失败或成功消息</p>
+<p>同步生产者只是在异步生产者之上封装了一层</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> syncProducer <span class="keyword">struct</span> &#123;</span><br><span class="line">    producer *asyncProducer</span><br><span class="line">    wg       sync.WaitGroup</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来分析异步生产者流程：</p>
+<p><a href="https://www.lixueduan.com/posts/kafka/06-sarama-producer/">https://www.lixueduan.com/posts/kafka/06-sarama-producer/</a></p>
+<h2 id="其他零散总结"><a href="#其他零散总结" class="headerlink" title="其他零散总结"></a>其他零散总结</h2><p>消息传递模式：</p>
+<ul>
+<li><p>点对点</p>
+<p>同步</p>
+</li>
+<li><p>发布-订阅</p>
+<p>异步</p>
+</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>KAFKA</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>http-go</title>
+    <url>/2022/11/27/http-go/</url>
+    <content><![CDATA[<h1 id="1-middleware"><a href="#1-middleware" class="headerlink" title="1. middleware"></a>1. middleware</h1><p><a href="https://www.alexedwards.net/blog/making-and-using-middleware">https://www.alexedwards.net/blog/making-and-using-middleware</a></p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">exampleMiddleware</span><span class="params">(next http.Handler)</span> <span class="title">http</span>.<span class="title">Handler</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> http.HandlerFunc(<span class="function"><span class="keyword">func</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">		<span class="comment">// Our middleware logic goes here...</span></span><br><span class="line">        <span class="comment">// 如果想要继续处理就执行以下，否则可直接return</span></span><br><span class="line">		next.ServeHTTP(w, r)</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
+  <entry>
+    <title>jwt</title>
+    <url>/2022/11/27/jwt/</url>
+    <content><![CDATA[<h1 id="1-背景"><a href="#1-背景" class="headerlink" title="1. 背景"></a>1. 背景</h1><p>Json Web Toke，为了在网络应用环境间传递声明而执行的一种基于Json的开放标准<a href="https://tools.ietf.org/html/rfc7519?spm=a2c4g.11186623.2.18.661d167c396yae">RFC7519</a></p>
+<p>server生成token颁发给client后，无需保存token就可验证token</p>
+<h1 id="2-规范介绍"><a href="#2-规范介绍" class="headerlink" title="2. 规范介绍"></a>2. 规范介绍</h1><h2 id="2-1-基本组成"><a href="#2-1-基本组成" class="headerlink" title="2.1 基本组成"></a>2.1 基本组成</h2><p>JWT标准token由三部分组成，总结为<code>header</code>.<code>payload</code>.<code>signature</code>，以下所称的base64是指base64url编码？</p>
+<ul>
+<li>header</li>
+</ul>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &#x27;typ&#x27;: &#x27;JWT&#x27;,    类型</span><br><span class="line">  &#x27;alg&#x27;: &#x27;HS256&#x27;   加密算法</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后将header进行base64编码</p>
+<ul>
+<li>payload</li>
+</ul>
+<p>有效信息</p>
+<p>标准信息包括以下：</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">iss：令牌颁发者。表示该令牌由谁创建，该声明是一个字符串</span><br><span class="line">sub:  Subject Identifier，iss提供的终端用户的标识，在iss范围内唯一，最长为255个ASCII个字符，区分大小写</span><br><span class="line">aud：Audience(s)，令牌的受众，分大小写的字符串数组</span><br><span class="line">exp：Expiration time，令牌的过期时间戳。超过此时间的token会作废， 该声明是一个整数，是1970年1月1日以来的秒数</span><br><span class="line">iat: 令牌的颁发时间，该声明是一个整数，是1970年1月1日以来的秒数</span><br><span class="line">jti: 令牌的唯一标识，该声明的值在令牌颁发者创建的每一个令牌中都是唯一的，为了防止冲突，它通常是一个密码学随机值。这个值相当于向结构化令牌中加入了一个攻击者无法获得的随机熵组件，有利于防止令牌猜测攻击和重放攻击。</span><br></pre></td></tr></table></figure>
+
+<p>还支持增加自定义配置</p>
+<p>然后将其base64编码</p>
+<ul>
+<li>siganature</li>
+</ul>
+<p>&lt; header base64编码&gt;.&lt;payload base64编码&gt;    -&gt;使用header中的加密方式进行加密再base64编码  –&gt;jwt第三部分</p>
+<h2 id="2-2-加密算法"><a href="#2-2-加密算法" class="headerlink" title="2.2 加密算法"></a>2.2 加密算法</h2><h3 id="2-2-1-空"><a href="#2-2-1-空" class="headerlink" title="2.2.1 空"></a>2.2.1 空</h3><p>header中的alg指定为<code>None</code></p>
+<p>把siganature置空，即提交header.payload到server，任何都可通过通过校验（不严谨，若校验时增加了对加密算法的校验，那么这一步理论上过不去）</p>
+<h3 id="2-2-2-HMAC"><a href="#2-2-2-HMAC" class="headerlink" title="2.2.2 HMAC"></a>2.2.2 HMAC</h3><p>对称加密算法</p>
+<h3 id="2-2-3-RSA"><a href="#2-2-3-RSA" class="headerlink" title="2.2.3 RSA"></a>2.2.3 RSA</h3><p>非对称加密算法</p>
+<h1 id="3-各语言实现"><a href="#3-各语言实现" class="headerlink" title="3.各语言实现"></a>3.各语言实现</h1><h2 id="3-1-Go"><a href="#3-1-Go" class="headerlink" title="3.1 Go"></a>3.1 Go</h2><p>原先是<code>github.com/dgrijalva/jwt-go</code>，现已迁移到？</p>
+<p> 定义了 <code>exp</code>和<code>iat</code>的话，在后面使用 <code>jwt.Parse()</code>时，会自动校验是否过期 </p>
+<p>核心过程：</p>
+<p>注意区分加了自定义配置的payload和标准payload去别，前者使用 ParseWithClaims，后后者使用Parse</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ValidateJWT</span><span class="params">(t <span class="keyword">string</span>)</span> <span class="params">(*jwt.MapClaims,error)</span></span> &#123;</span><br><span class="line">	token,err := jwt.Parse(t, <span class="function"><span class="keyword">func</span><span class="params">(token *jwt.Token)</span> <span class="params">(<span class="keyword">interface</span>&#123;&#125;, error)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 返回什么要看加密算法是什么，rsa返回rsa.Publickey，HMAC返回[]byte(key)</span></span><br><span class="line">		<span class="keyword">return</span> verifyKey,<span class="literal">nil</span></span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">    claims, ok := token.claims.(jwt.MapClaims)&#123;</span><br><span class="line">        <span class="keyword">if</span> !ok&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">nil</span>,err</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  <span class="keyword">return</span> claims, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-1-1-生成token"><a href="#3-1-1-生成token" class="headerlink" title="3.1.1 生成token"></a>3.1.1 生成token</h3><h3 id="3-1-2-校验token"><a href="#3-1-2-校验token" class="headerlink" title="3.1.2 校验token"></a>3.1.2 校验token</h3><h2 id="3-2-Java"><a href="#3-2-Java" class="headerlink" title="3.2 Java"></a>3.2 Java</h2><p> <a href="https://github.com/jwtk/jjwt">https://github.com/jwtk/jjwt</a> </p>
+<p>备注：</p>
+<p><a href="https://blog.csdn.net/mijichui2153/article/details/106629860">base64编码说明</a></p>
+<p>base64和base64url区别？</p>
+<p><em><strong>*base64编码结果中会有+、/、=三个特殊字符，它们在url中属于特殊字符是直接无法传递的；*</strong></em></p>
+<p><em><strong>*base64url其实就是把字符中的’+’和’/‘分别替换成’-‘和’_’，另外把末尾填充的‘=’去掉;其他都一样。*</strong></em></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>pprof</title>
+    <url>/2022/09/07/pprof/</url>
+    <content><![CDATA[<h1 id="1-初识"><a href="#1-初识" class="headerlink" title="1. 初识"></a>1. 初识</h1><p>profiling，程序执行过程中，收集能够反映程序运行状态的数据，是一种动态研究程序行为的方法</p>
+<p>go自带的pprof库可以用来分析程序的运行情况，包括两种：</p>
+<ul>
+<li>runtime/pprof</li>
+</ul>
+<p>运行时间一定</p>
+<ul>
+<li>net/http/pprof</li>
+</ul>
+<p>一直运行以提供服务</p>
+<p>实际上也是调用runtime/pprof，封装成接口提供网络访问</p>
+<p>pprof可提供性能数据：</p>
+<ul>
+<li>allocs</li>
+</ul>
+<p>内存分配</p>
+<ul>
+<li>blocks</li>
+</ul>
+<p>阻塞操作</p>
+<ul>
+<li>cmdline</li>
+</ul>
+<p>显示程序启动命令及参数</p>
+<ul>
+<li>goroutine</li>
+</ul>
+<p>当前所有协程的堆栈信息</p>
+<ul>
+<li>heap</li>
+</ul>
+<p>堆上内存</p>
+<ul>
+<li>mutex</li>
+</ul>
+<p>锁争用情况</p>
+<ul>
+<li>profile</li>
+</ul>
+<p>cpu占用情况</p>
+<ul>
+<li>threadcreate</li>
+</ul>
+<p>系统线程创建情况</p>
+<ul>
+<li>trace</li>
+</ul>
+<p>程序运行追踪信息</p>
+<p>备注：</p>
+<p><code>allocs</code>和<code>heap</code>采样信息一致，不过前者是所有对象的内存分配，后者是活跃对象的内存分配    （何为活跃对象？）</p>
+<h1 id="2-使用"><a href="#2-使用" class="headerlink" title="2. 使用"></a>2. 使用</h1><h2 id="2-1-runtime-pprof"><a href="#2-1-runtime-pprof" class="headerlink" title="2.1 runtime/pprof"></a>2.1 runtime/pprof</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">&quot;runtime/pprof&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> cpuprofile = flag.String(<span class="string">&quot;cpuprofile&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;write cpu profile to file&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// …………</span></span><br><span class="line">        </span><br><span class="line">    pprof.StartCPUProfile(f)  <span class="comment">// 启动cpu profiling</span></span><br><span class="line">    <span class="keyword">defer</span> pprof.StopCPUProfile()  <span class="comment">// 将数据刷新到文件里</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// …………</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>类似的还有启动内存profile等等</p>
+<h2 id="2-2-net-http-pprof"><a href="#2-2-net-http-pprof" class="headerlink" title="2.2 net/http/pprof"></a>2.2 net/http/pprof</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> _ <span class="string">&quot;net/http/pprof&quot;</span>  <span class="comment">// 重点</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">initPprofMonitor</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	pPort := global.Conf.MustInt(<span class="string">&quot;http_server&quot;</span>, <span class="string">&quot;pprofport&quot;</span>, <span class="number">8080</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> err error</span><br><span class="line">	addr := <span class="string">&quot;:&quot;</span> + strconv.Itoa(pPort)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		err = http.ListenAndServe(addr, <span class="literal">nil</span>)   <span class="comment">// 启动端口监听</span></span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			logger.Error(<span class="string">&quot;funcRetErr=http.ListenAndServe||err=%s&quot;</span>, err.Error())</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>pprof会自动注册handler，处理相关请求</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// src/net/http/pprof/pprof.go:71</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	http.Handle(<span class="string">&quot;/debug/pprof/&quot;</span>, http.HandlerFunc(Index))</span><br><span class="line">	http.Handle(<span class="string">&quot;/debug/pprof/cmdline&quot;</span>, http.HandlerFunc(Cmdline))</span><br><span class="line">	http.Handle(<span class="string">&quot;/debug/pprof/profile&quot;</span>, http.HandlerFunc(Profile))</span><br><span class="line">	http.Handle(<span class="string">&quot;/debug/pprof/symbol&quot;</span>, http.HandlerFunc(Symbol))</span><br><span class="line">	http.Handle(<span class="string">&quot;/debug/pprof/trace&quot;</span>, http.HandlerFunc(Trace))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 第一个路径 <code>/debug/pprof/</code> 下面其实还有 5 个子路径： </p>
+<p>goroutine<br>threadcreate<br>heap<br>block<br>mutex </p>
+<p>启动服务后，可以直接在浏览器中访问：</p>
+<p><a href="http://ip:port/debug/pprof">http://ip:port/debug/pprof</a></p>
+<p>得到汇总页面</p>
+<p>可以直接点击上面的链接，进入子页面，查看相关的汇总信息。</p>
+<p>关于 goroutine 的信息有两个链接，<code>goroutine</code> 和 <code>full goroutine stack dump</code>，前者是一个汇总的消息，可以查看 goroutines 的总体情况，后者则可以看到每一个 goroutine 的状态。页面具体内容的解读可以参考【大彬】的文章。</p>
+<p>点击 <code>profile</code> 和 <code>trace</code> 则会在后台进行一段时间的数据采样，采样完成后，返回给浏览器一个 profile 文件，之后在本地通过 <code>go tool pprof</code> 工具进行分析。</p>
+<h1 id="3-数据分析"><a href="#3-数据分析" class="headerlink" title="3. 数据分析"></a>3. 数据分析</h1><h2 id="3-1-交互式"><a href="#3-1-交互式" class="headerlink" title="3.1 交互式"></a>3.1 交互式</h2><p>进入交互模式的命令有下面两种：</p>
+<ol>
+<li>已获取运行数据的情况下，比如使用runtime/pprof，程序执行结束后会将数据写入文件；或者2.2章节中提到的汇总页面点击某一项会进行一段时间的数据采集并生成文件</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">go tool pprof 文件路径  </span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>直接从http server中获取数据并分析</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">go tool pprof http://ip:port/debug/pprof/[选填]</span><br><span class="line"><span class="meta">#</span><span class="bash"> cpu,默认从当前开始收集30s</span></span><br><span class="line">go tool pprof http://ip:port/debug/pprof/profile</span><br><span class="line"><span class="meta">#</span><span class="bash"> cpu 自定义时间</span></span><br><span class="line">go tool pprof http://ip:port/debug/pprof/profile?seconds=120</span><br><span class="line"><span class="meta">#</span><span class="bash"> heap</span></span><br><span class="line">go tool pprof http://ip:port/debug/pprof/heap</span><br><span class="line"><span class="meta">#</span><span class="bash"> gorouine</span></span><br><span class="line">go tool pprof http://ip:port/debug/pprof/goroutine</span><br><span class="line"><span class="meta">#</span><span class="bash"> block</span></span><br><span class="line">go tool pprof http://ip:port/debug/pprof/block</span><br><span class="line"><span class="meta">#</span><span class="bash"> mutex</span></span><br><span class="line">go tool pprof http://ip:port/debug/pprof/mutex</span><br></pre></td></tr></table></figure>
+
+<p>进入交互模式后，常用命令有top、list、web等</p>
+<ul>
+<li>top</li>
+</ul>
+<p>得到几列数据</p>
+<ul>
+<li>list</li>
+</ul>
+<p>使用正则比配，查看某个函数的代码</p>
+<ul>
+<li>web</li>
+</ul>
+<p>需要安装graphviz</p>
+<p>图展示</p>
+<ul>
+<li>traces</li>
+</ul>
+<p>列出函数调用栈</p>
+<h2 id="3-2-ui"><a href="#3-2-ui" class="headerlink" title="3.2 ui"></a>3.2 ui</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">go tool pprof --http=:8080 数据文件或者server地址</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-实战"><a href="#4-实战" class="headerlink" title="4. 实战"></a>4. 实战</h1><p><a href="https://segmentfault.com/a/1190000019222661">go内存泄漏</a></p>
+]]></content>
+      <tags>
+        <tag>go</tag>
+      </tags>
+  </entry>
 </search>
