@@ -859,6 +859,8 @@
 
 <p>接下来分析异步生产者流程：</p>
 <p><a href="https://www.lixueduan.com/posts/kafka/06-sarama-producer/">https://www.lixueduan.com/posts/kafka/06-sarama-producer/</a></p>
+<p><strong>疑问：</strong></p>
+<p>通过go-sarama与kafka server建立连接，是与每个broker都建立连接？</p>
 <h2 id="其他零散总结"><a href="#其他零散总结" class="headerlink" title="其他零散总结"></a>其他零散总结</h2><p>消息传递模式：</p>
 <ul>
 <li><p>点对点</p>
@@ -1030,6 +1032,55 @@
 ]]></content>
       <tags>
         <tag>go</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ipv6</title>
+    <url>/2022/12/04/ipv6/</url>
+    <content><![CDATA[<h1 id="1-背景"><a href="#1-背景" class="headerlink" title="1. 背景"></a>1. 背景</h1><p>为什么出现ipv6，直接原因是ipv4中的网络资源地址即ip不够。</p>
+<h1 id="2-组成结构"><a href="#2-组成结构" class="headerlink" title="2. 组成结构"></a>2. 组成结构</h1><h2 id="2-1-地址表示"><a href="#2-1-地址表示" class="headerlink" title="2.1 地址表示"></a>2.1 地址表示</h2><p>IPV6的地址长度128位，是IPV4地址长度的四倍，因此十进制的地址表示方法不再适用，采用十六进制表示，共有三种表示方法：</p>
+<p>①冒分十六进制表示法</p>
+<p>X:X:X:X:X:X:X:X</p>
+<p>每个X代表四个十六进制数，这种表示方法中，每个X的前导0是可以省略的，如：</p>
+<p>2001:0DB8:0000:0023:0008:0800:200C:417A→ 2001:DB8:0:23:8:800:200C:417A </p>
+<p>②0位压缩表示法</p>
+<p>在某些情况下，一个IPv6地址中间可能包含很长的一段0，可以把连续的一段0压缩为“::”。但为保证地址解析的唯一性，地址中”::”只能出现一次，例如：</p>
+<p>FF01:0:0:0:0:0:0:1101 → FF01::1101</p>
+<p>0:0:0:0:0:0:0:1 → ::1</p>
+<p>0:0:0:0:0:0:0:0 → ::</p>
+<p>③ 内嵌IPv4地址表示法</p>
+<p>为了实现IPv4-IPv6互通，IPv4地址会嵌入IPv6地址中，此时地址常表示为：X:X:X:X:X:X:d.d.d.d，前96b采用冒分十六进制表示，而最后32b地址则使用IPv4的点分十进制表示，例如::192.168.0.1与::FFFF:192.168.0.1就是两个典型的例子，注意在前96b中，压缩0位的方法依旧适用</p>
+<h2 id="2-2-报文结构"><a href="#2-2-报文结构" class="headerlink" title="2.2 报文结构"></a>2.2 报文结构</h2>]]></content>
+      <tags>
+        <tag>NETWORK</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>socket</title>
+    <url>/2022/12/04/socket/</url>
+    <content><![CDATA[<h1 id="1-背景"><a href="#1-背景" class="headerlink" title="1. 背景"></a>1. 背景</h1><p><a href="https://blog.csdn.net/qingfengtsing/article/details/26136481">https://blog.csdn.net/qingfengtsing/article/details/26136481</a></p>
+<p>区别于传输层socket，传输层socket需要关心传输层如何封装，不用关心ip层如何封装，理论上来说可以拦截任何传输层的协议，如tcp udp甚至自定义的传输层协议</p>
+<p>原始套接字，工作在网络层或者数据链路层（？）</p>
+<p>工作在网络层的raw socket不使用udp和tcp协议，系统收到tcp以及udp协议的包不会发送到工作在网络层的raw socket，如果raw socket工作在链路层，那么收到的所有的数据包都会复制一份到raw socket</p>
+<p>int socketfd = socket(AF_INET,SOCK_RAW,IPPROTO_ICMP);/<em>在网络层使用的原始套接字</em>/</p>
+<p>int socketfd = socket(PF_PACKET,SOCK_RAW,htons(ETH_P_IP));/<em>在链路层使用</em>/</p>
+<h1 id="2-整体流程"><a href="#2-整体流程" class="headerlink" title="2. 整体流程"></a>2. 整体流程</h1><p>只有root或者setcap提权才可以创建</p>
+<p>首先说明：raw socket捕捉到的只是数据的一份拷贝，内核协议栈还是会按照之前的决策继续处理该数据包</p>
+<p>网卡首先对数据帧进行硬过滤（根据网卡模式的不同会有不同动作），如果检查通过，会首先检查系统中是否有raw socket套接字监听数据链路层，如果有，并且协议符合，那么会向socket的接收缓冲区发送一份数据帧拷贝，然后进入下一步IP层，ip层会对数据包进行软过滤（比如检查校验或者丢弃非本机ip或者广播ip的数据包），如果成功则会检查系统中是否有网络层的套接字，如果有而且协议符合，那么给相应socket的接收缓冲区发送一份数据帧拷贝，然后进入下一层</p>
+<p><code>netstat -nlp</code> </p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">raw ip:1 0.0.0.0 </span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="3-具体实现"><a href="#3-具体实现" class="headerlink" title="3. 具体实现"></a>3. 具体实现</h1><h2 id="3-1-Go"><a href="#3-1-Go" class="headerlink" title="3.1 Go"></a>3.1 Go</h2><h3 id="3-1-1-标准包"><a href="#3-1-1-标准包" class="headerlink" title="3.1.1 标准包"></a>3.1.1 标准包</h3><p>net</p>
+<p>net.listen等</p>
+<h3 id="3-1-2-syscall系统调用"><a href="#3-1-2-syscall系统调用" class="headerlink" title="3.1.2 syscall系统调用"></a>3.1.2 syscall系统调用</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// domain：ipv4/或者ipv6或者链路层数据帧</span></span><br><span class="line"><span class="comment">//	AF_UNSPEC  = 0</span></span><br><span class="line"><span class="comment">//	AF_UNIX    = 1  同一台机器上的进程通信</span></span><br><span class="line"><span class="comment">//	AF_INET    = 2  服务器之间的网络通信（ipv4）</span></span><br><span class="line"><span class="comment">//	AF_INET6   = 23 服务器之间的网络通信（ipv6）</span></span><br><span class="line"><span class="comment">//	AF_NETBIOS = 17</span></span><br><span class="line"><span class="comment">//	AF_PACKET   数据链路层数据帧，当前只有linux支持</span></span><br><span class="line"><span class="comment">// typ：	SOCK_STREAM    = 1 基于tcp的socket通信，应用层socket</span></span><br><span class="line"><span class="comment">//	SOCK_DGRAM     = 2 基于udp的socket通信，应用层socket</span></span><br><span class="line"><span class="comment">//	SOCK_RAW       = 3 原始套接字</span></span><br><span class="line"><span class="comment">//	SOCK_SEQPACKET = 5 </span></span><br><span class="line"><span class="comment">// proto：协议</span></span><br><span class="line"><span class="comment">//	IPPROTO_IP   = 0  所有的IP数据包</span></span><br><span class="line"><span class="comment">//	IPPROTO_IPV6 = 0x29</span></span><br><span class="line"><span class="comment">//	IPPROTO_TCP  = 6</span></span><br><span class="line"><span class="comment">//	IPPROTO_UDP  = 17</span></span><br><span class="line"><span class="comment">//	IPPROTO_ICMP 接收ICMP协议的数据  1</span></span><br><span class="line"><span class="comment">//	IPPROTO_RAW 只能用来发送IP数据包，不能接收数据  255</span></span><br><span class="line">syscall.Socket(domain, typ, proto <span class="keyword">int</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="3-2-Java"><a href="#3-2-Java" class="headerlink" title="3.2 Java"></a>3.2 Java</h2>]]></content>
+      <tags>
+        <tag>NETWORK</tag>
       </tags>
   </entry>
 </search>

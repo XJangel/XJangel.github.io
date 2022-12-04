@@ -23,22 +23,21 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","version":"8.2.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="一、使用场景1.1 主备切换1.1.1 流程介绍etcd自带concurrency介绍 1.1.2 代码示例(GO)1  1.1.3 point">
+<meta name="description" content="1. 背景https:&#x2F;&#x2F;blog.csdn.net&#x2F;qingfengtsing&#x2F;article&#x2F;details&#x2F;26136481 区别于传输层socket，传输层socket需要关心传输层如何封装，不用关心ip层如何封装，理论上来说可以拦截任何传输层的协议，如tcp udp甚至自定义的传输层协议 原始套接字，工作在网络层或者数据链路层（？） 工作在网络层的raw socket不使用udp和tcp">
 <meta property="og:type" content="article">
-<meta property="og:title" content="etcd">
-<meta property="og:url" content="http://example.com/2022/04/13/etcd/index.html">
+<meta property="og:title" content="socket">
+<meta property="og:url" content="http://example.com/2022/12/04/socket/index.html">
 <meta property="og:site_name" content="jjx">
-<meta property="og:description" content="一、使用场景1.1 主备切换1.1.1 流程介绍etcd自带concurrency介绍 1.1.2 代码示例(GO)1  1.1.3 point">
+<meta property="og:description" content="1. 背景https:&#x2F;&#x2F;blog.csdn.net&#x2F;qingfengtsing&#x2F;article&#x2F;details&#x2F;26136481 区别于传输层socket，传输层socket需要关心传输层如何封装，不用关心ip层如何封装，理论上来说可以拦截任何传输层的协议，如tcp udp甚至自定义的传输层协议 原始套接字，工作在网络层或者数据链路层（？） 工作在网络层的raw socket不使用udp和tcp">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-04-13T11:50:18.000Z">
-<meta property="article:modified_time" content="2022-05-15T07:56:26.543Z">
+<meta property="article:published_time" content="2022-12-04T10:58:15.000Z">
+<meta property="article:modified_time" content="2022-12-04T15:17:39.849Z">
 <meta property="article:author" content="suki">
-<meta property="article:tag" content="Go">
-<meta property="article:tag" content="etcd">
+<meta property="article:tag" content="NETWORK">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://example.com/2022/04/13/etcd/">
+<link rel="canonical" href="http://example.com/2022/12/04/socket/">
 
 
 <script class="page-configurations">
@@ -50,7 +49,7 @@
     lang   : 'en'
   };
 </script>
-<title>etcd | jjx</title>
+<title>socket | jjx</title>
   
 
 
@@ -189,7 +188,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">一、使用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-%E4%B8%BB%E5%A4%87%E5%88%87%E6%8D%A2"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 主备切换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-1-%E6%B5%81%E7%A8%8B%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1.1 流程介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-2-%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B-GO"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.1.2 代码示例(GO)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-3-point"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.1.3 point</span></a></li></ol></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">1. 背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E6%95%B4%E4%BD%93%E6%B5%81%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">2. 整体流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">3. 具体实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-Go"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 Go</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-1-%E6%A0%87%E5%87%86%E5%8C%85"><span class="nav-number">3.1.1.</span> <span class="nav-text">3.1.1 标准包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-2-syscall%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">3.1.2.</span> <span class="nav-text">3.1.2 syscall系统调用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-Java"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 Java</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -257,7 +256,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/13/etcd/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/12/04/socket/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/lay.gif">
@@ -270,7 +269,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          etcd
+          socket
         </h1>
 
         <div class="post-meta-container">
@@ -280,16 +279,10 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
+      
 
-      <time title="Created: 2022-04-13 19:50:18" itemprop="dateCreated datePublished" datetime="2022-04-13T19:50:18+08:00">2022-04-13</time>
+      <time title="Created: 2022-12-04 18:58:15 / Modified: 23:17:39" itemprop="dateCreated datePublished" datetime="2022-12-04T18:58:15+08:00">2022-12-04</time>
     </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">Edited on</span>
-        <time title="Modified: 2022-05-15 15:56:26" itemprop="dateModified" datetime="2022-05-15T15:56:26+08:00">2022-05-15</time>
-      </span>
 
   
     <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
@@ -308,10 +301,27 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h1 id="一、使用场景"><a href="#一、使用场景" class="headerlink" title="一、使用场景"></a>一、使用场景</h1><h2 id="1-1-主备切换"><a href="#1-1-主备切换" class="headerlink" title="1.1 主备切换"></a>1.1 主备切换</h2><h3 id="1-1-1-流程介绍"><a href="#1-1-1-流程介绍" class="headerlink" title="1.1.1 流程介绍"></a>1.1.1 流程介绍</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/cyq6239075/article/details/109862443">etcd自带concurrency介绍</a></p>
-<h3 id="1-1-2-代码示例-GO"><a href="#1-1-2-代码示例-GO" class="headerlink" title="1.1.2 代码示例(GO)"></a>1.1.2 代码示例(GO)</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+        <h1 id="1-背景"><a href="#1-背景" class="headerlink" title="1. 背景"></a>1. 背景</h1><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qingfengtsing/article/details/26136481">https://blog.csdn.net/qingfengtsing/article/details/26136481</a></p>
+<p>区别于传输层socket，传输层socket需要关心传输层如何封装，不用关心ip层如何封装，理论上来说可以拦截任何传输层的协议，如tcp udp甚至自定义的传输层协议</p>
+<p>原始套接字，工作在网络层或者数据链路层（？）</p>
+<p>工作在网络层的raw socket不使用udp和tcp协议，系统收到tcp以及udp协议的包不会发送到工作在网络层的raw socket，如果raw socket工作在链路层，那么收到的所有的数据包都会复制一份到raw socket</p>
+<p>int socketfd = socket(AF_INET,SOCK_RAW,IPPROTO_ICMP);/<em>在网络层使用的原始套接字</em>/</p>
+<p>int socketfd = socket(PF_PACKET,SOCK_RAW,htons(ETH_P_IP));/<em>在链路层使用</em>/</p>
+<h1 id="2-整体流程"><a href="#2-整体流程" class="headerlink" title="2. 整体流程"></a>2. 整体流程</h1><p>只有root或者setcap提权才可以创建</p>
+<p>首先说明：raw socket捕捉到的只是数据的一份拷贝，内核协议栈还是会按照之前的决策继续处理该数据包</p>
+<p>网卡首先对数据帧进行硬过滤（根据网卡模式的不同会有不同动作），如果检查通过，会首先检查系统中是否有raw socket套接字监听数据链路层，如果有，并且协议符合，那么会向socket的接收缓冲区发送一份数据帧拷贝，然后进入下一步IP层，ip层会对数据包进行软过滤（比如检查校验或者丢弃非本机ip或者广播ip的数据包），如果成功则会检查系统中是否有网络层的套接字，如果有而且协议符合，那么给相应socket的接收缓冲区发送一份数据帧拷贝，然后进入下一层</p>
+<p><code>netstat -nlp</code> </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">raw ip:1 0.0.0.0 </span><br></pre></td></tr></table></figure>
 
-<h3 id="1-1-3-point"><a href="#1-1-3-point" class="headerlink" title="1.1.3 point"></a>1.1.3 point</h3>
+
+
+<h1 id="3-具体实现"><a href="#3-具体实现" class="headerlink" title="3. 具体实现"></a>3. 具体实现</h1><h2 id="3-1-Go"><a href="#3-1-Go" class="headerlink" title="3.1 Go"></a>3.1 Go</h2><h3 id="3-1-1-标准包"><a href="#3-1-1-标准包" class="headerlink" title="3.1.1 标准包"></a>3.1.1 标准包</h3><p>net</p>
+<p>net.listen等</p>
+<h3 id="3-1-2-syscall系统调用"><a href="#3-1-2-syscall系统调用" class="headerlink" title="3.1.2 syscall系统调用"></a>3.1.2 syscall系统调用</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// domain：ipv4/或者ipv6或者链路层数据帧</span></span><br><span class="line"><span class="comment">//	AF_UNSPEC  = 0</span></span><br><span class="line"><span class="comment">//	AF_UNIX    = 1  同一台机器上的进程通信</span></span><br><span class="line"><span class="comment">//	AF_INET    = 2  服务器之间的网络通信（ipv4）</span></span><br><span class="line"><span class="comment">//	AF_INET6   = 23 服务器之间的网络通信（ipv6）</span></span><br><span class="line"><span class="comment">//	AF_NETBIOS = 17</span></span><br><span class="line"><span class="comment">//	AF_PACKET   数据链路层数据帧，当前只有linux支持</span></span><br><span class="line"><span class="comment">// typ：	SOCK_STREAM    = 1 基于tcp的socket通信，应用层socket</span></span><br><span class="line"><span class="comment">//	SOCK_DGRAM     = 2 基于udp的socket通信，应用层socket</span></span><br><span class="line"><span class="comment">//	SOCK_RAW       = 3 原始套接字</span></span><br><span class="line"><span class="comment">//	SOCK_SEQPACKET = 5 </span></span><br><span class="line"><span class="comment">// proto：协议</span></span><br><span class="line"><span class="comment">//	IPPROTO_IP   = 0  所有的IP数据包</span></span><br><span class="line"><span class="comment">//	IPPROTO_IPV6 = 0x29</span></span><br><span class="line"><span class="comment">//	IPPROTO_TCP  = 6</span></span><br><span class="line"><span class="comment">//	IPPROTO_UDP  = 17</span></span><br><span class="line"><span class="comment">//	IPPROTO_ICMP 接收ICMP协议的数据  1</span></span><br><span class="line"><span class="comment">//	IPPROTO_RAW 只能用来发送IP数据包，不能接收数据  255</span></span><br><span class="line">syscall.Socket(domain, typ, proto <span class="keyword">int</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="3-2-Java"><a href="#3-2-Java" class="headerlink" title="3.2 Java"></a>3.2 Java</h2>
     </div>
 
     
@@ -330,22 +340,18 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Go/" rel="tag"># Go</a>
-              <a href="/tags/etcd/" rel="tag"># etcd</a>
+              <a href="/tags/NETWORK/" rel="tag"># NETWORK</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2022/02/08/GRPC-GO/" rel="prev" title="GRPC-GO">
-                  <i class="fa fa-chevron-left"></i> GRPC-GO
+                <a href="/2022/12/04/ipv6/" rel="prev" title="ipv6">
+                  <i class="fa fa-chevron-left"></i> ipv6
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2022/04/26/linux%E6%89%8B%E5%86%8C/" rel="next" title="linux手册">
-                  linux手册 <i class="fa fa-chevron-right"></i>
-                </a>
             </div>
           </div>
     </footer>
