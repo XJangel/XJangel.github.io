@@ -777,7 +777,7 @@
 <li>第三次 （client-&gt;server）</li>
 </ol>
 <p>3.1 Client Key Exchange </p>
-<p>验证客户端证书（若tls config配置skipVerify则不必验证；若tls serverName不为空，则对比serverName与server证书中的commonName或者SAN是否一致）</p>
+<p>验证server端证书（若tls config配置skipVerify则不必验证；若tls serverName不为空，则对比serverName与server证书中的commonName或者SAN是否一致）</p>
 <p><strong>Note：</strong>go 1.15开始弃用commonName，要求SAN</p>
 <p>随机数3，又名pre-master，并用server的公钥加密该随机数传递给server</p>
 <p>3.2 ChangeCipher Spec</p>
@@ -878,10 +878,51 @@
   <entry>
     <title>http-go</title>
     <url>/2022/11/27/http-go/</url>
-    <content><![CDATA[<h1 id="1-middleware"><a href="#1-middleware" class="headerlink" title="1. middleware"></a>1. middleware</h1><p><a href="https://www.alexedwards.net/blog/making-and-using-middleware">https://www.alexedwards.net/blog/making-and-using-middleware</a></p>
+    <content><![CDATA[<h1 id="1-client"><a href="#1-client" class="headerlink" title="1. client"></a>1. client</h1><p>net/http/client</p>
+<p>client中缓存了tcp连接状态，http client应该被复用而不是每次用到的时候都创建。client是goroutine并发安全的。</p>
+<p>重定向：header中的敏感信息（Authorization、WWW-Authenticate、Cookie）不会携带访问不信任的目的地址，以下场景例外：</p>
+<ol>
+<li><p>重定向的地址是原域名的子域名或者同级，比如访问foo.com重定向到foo.com或者sub.foo.com是会携带敏感信息的，但重定向到bar.com则不会</p>
+</li>
+<li><p>cookie，详见注释</p>
+</li>
+</ol>
+<h2 id="1-1-主要结构体以及函数"><a href="#1-1-主要结构体以及函数" class="headerlink" title="1.1  主要结构体以及函数"></a>1.1  主要结构体以及函数</h2><h3 id="1-1-1-Client"><a href="#1-1-1-Client" class="headerlink" title="1.1.1 Client"></a>1.1.1 Client</h3><p>http client端发起请求及接收response，可自行创建http client，指定transport等参数，也可以使用默认的http client，即DefaultClient(Client的空结构体)</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> Client <span class="keyword">struct</span> &#123;</span><br><span class="line">    Transport RoundTripper <span class="comment">// interface，实现一次http事务，即根据request返回response</span></span><br><span class="line">    CheckRedirect <span class="function"><span class="keyword">func</span><span class="params">(req *Request, via []*Request)</span> <span class="title">error</span> //检查重定向</span></span><br><span class="line">    Jar CookieJar <span class="comment">//cookie</span></span><br><span class="line">    Timeout time.Duration <span class="comment">//超时时间，包括连接、重定向以及读取response，0代表永不超时。The timer remains running after Get, Head, Post, or Do return and will interrupt reading of the Response.Body.</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 全局变量，默认httpClient，可用于get/post/put</span></span><br><span class="line"><span class="keyword">var</span> DefaultClient = &amp;Client&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>client.Do(req *Request)</p>
+<p>通用方法，调用者自己构造request，传进来发送</p>
+</li>
+<li><p>client.Get(url string)</p>
+<p>client.Do()基础上的一层封装，根据参数构造Get request，再调用Do()</p>
+</li>
+<li><p>client.Post(url, contentType string, body io.Reader)</p>
+<p>client.Do()基础上的一层封装，根据参数构造Post request，再调用Do()</p>
+</li>
+<li><p>client.PostFrom(url string, data url.Values)</p>
+<p>client.Post()基础上的一层封装，调用Post()</p>
+</li>
+<li><p>client.Head(url string)</p>
+<p>client.Head()基础上的一层封装，根据参数构造Head request，再调用Do()</p>
+</li>
+</ul>
+<p>可直接调用的方法，都是调用defaultClient的相应方法</p>
+<p>http.Get()–&gt;http.DefaultClient.Get()</p>
+<p>http.Post()–&gt;http.DefaultClient.Post()</p>
+<p>http.PostFrom()–&gt;http.DefaultClient.PostFrom()</p>
+<p>http.Head()–&gt;http.DefaultClient.Head()</p>
+<p>TODO：</p>
+<p>PostForm是什么意思？</p>
+<p>关于tls，比如证书，比如加密套件默认值是怎样的？</p>
+<h1 id="1-middleware"><a href="#1-middleware" class="headerlink" title="1. middleware"></a>1. middleware</h1><p><a href="https://www.alexedwards.net/blog/making-and-using-middleware">https://www.alexedwards.net/blog/making-and-using-middleware</a></p>
 <figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">exampleMiddleware</span><span class="params">(next http.Handler)</span> <span class="title">http</span>.<span class="title">Handler</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> http.HandlerFunc(<span class="function"><span class="keyword">func</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">		<span class="comment">// Our middleware logic goes here...</span></span><br><span class="line">        <span class="comment">// 如果想要继续处理就执行以下，否则可直接return</span></span><br><span class="line">		next.ServeHTTP(w, r)</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 ]]></content>
+      <tags>
+        <tag>GO</tag>
+        <tag>HTTP</tag>
+      </tags>
   </entry>
   <entry>
     <title>jwt</title>

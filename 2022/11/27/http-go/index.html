@@ -23,16 +23,18 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"example.com","root":"/","images":"/images","scheme":"Pisces","version":"8.2.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="1. middlewarehttps:&#x2F;&#x2F;www.alexedwards.net&#x2F;blog&#x2F;making-and-using-middleware 1234567func exampleMiddleware(next http.Handler) http.Handler &amp;#123;	return http.HandlerFunc(func(w http.ResponseWriter, r *ht">
+<meta name="description" content="1. clientnet&#x2F;http&#x2F;client client中缓存了tcp连接状态，http client应该被复用而不是每次用到的时候都创建。client是goroutine并发安全的。 重定向：header中的敏感信息（Authorization、WWW-Authenticate、Cookie）不会携带访问不信任的目的地址，以下场景例外：  重定向的地址是原域名的子域名或者同级，比如访问fo">
 <meta property="og:type" content="article">
 <meta property="og:title" content="http-go">
 <meta property="og:url" content="http://example.com/2022/11/27/http-go/index.html">
 <meta property="og:site_name" content="jjx">
-<meta property="og:description" content="1. middlewarehttps:&#x2F;&#x2F;www.alexedwards.net&#x2F;blog&#x2F;making-and-using-middleware 1234567func exampleMiddleware(next http.Handler) http.Handler &amp;#123;	return http.HandlerFunc(func(w http.ResponseWriter, r *ht">
+<meta property="og:description" content="1. clientnet&#x2F;http&#x2F;client client中缓存了tcp连接状态，http client应该被复用而不是每次用到的时候都创建。client是goroutine并发安全的。 重定向：header中的敏感信息（Authorization、WWW-Authenticate、Cookie）不会携带访问不信任的目的地址，以下场景例外：  重定向的地址是原域名的子域名或者同级，比如访问fo">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-11-27T09:02:45.000Z">
-<meta property="article:modified_time" content="2022-11-27T09:12:14.646Z">
+<meta property="article:modified_time" content="2022-12-13T15:21:58.199Z">
 <meta property="article:author" content="suki">
+<meta property="article:tag" content="GO">
+<meta property="article:tag" content="HTTP">
 <meta name="twitter:card" content="summary">
 
 
@@ -187,7 +189,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-middleware"><span class="nav-number">1.</span> <span class="nav-text">1. middleware</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-client"><span class="nav-number">1.</span> <span class="nav-text">1. client</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-%E4%B8%BB%E8%A6%81%E7%BB%93%E6%9E%84%E4%BD%93%E4%BB%A5%E5%8F%8A%E5%87%BD%E6%95%B0"><span class="nav-number">1.1.</span> <span class="nav-text">1.1  主要结构体以及函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-1-Client"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1.1 Client</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-middleware"><span class="nav-number">2.</span> <span class="nav-text">1. middleware</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -216,7 +218,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -278,10 +280,16 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2022-11-27 17:02:45 / Modified: 17:12:14" itemprop="dateCreated datePublished" datetime="2022-11-27T17:02:45+08:00">2022-11-27</time>
+      <time title="Created: 2022-11-27 17:02:45" itemprop="dateCreated datePublished" datetime="2022-11-27T17:02:45+08:00">2022-11-27</time>
     </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">Edited on</span>
+        <time title="Modified: 2022-12-13 23:21:58" itemprop="dateModified" datetime="2022-12-13T23:21:58+08:00">2022-12-13</time>
+      </span>
 
   
     <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
@@ -300,7 +308,44 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h1 id="1-middleware"><a href="#1-middleware" class="headerlink" title="1. middleware"></a>1. middleware</h1><p><a target="_blank" rel="noopener" href="https://www.alexedwards.net/blog/making-and-using-middleware">https://www.alexedwards.net/blog/making-and-using-middleware</a></p>
+        <h1 id="1-client"><a href="#1-client" class="headerlink" title="1. client"></a>1. client</h1><p>net/http/client</p>
+<p>client中缓存了tcp连接状态，http client应该被复用而不是每次用到的时候都创建。client是goroutine并发安全的。</p>
+<p>重定向：header中的敏感信息（Authorization、WWW-Authenticate、Cookie）不会携带访问不信任的目的地址，以下场景例外：</p>
+<ol>
+<li><p>重定向的地址是原域名的子域名或者同级，比如访问foo.com重定向到foo.com或者sub.foo.com是会携带敏感信息的，但重定向到bar.com则不会</p>
+</li>
+<li><p>cookie，详见注释</p>
+</li>
+</ol>
+<h2 id="1-1-主要结构体以及函数"><a href="#1-1-主要结构体以及函数" class="headerlink" title="1.1  主要结构体以及函数"></a>1.1  主要结构体以及函数</h2><h3 id="1-1-1-Client"><a href="#1-1-1-Client" class="headerlink" title="1.1.1 Client"></a>1.1.1 Client</h3><p>http client端发起请求及接收response，可自行创建http client，指定transport等参数，也可以使用默认的http client，即DefaultClient(Client的空结构体)</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Client <span class="keyword">struct</span> &#123;</span><br><span class="line">    Transport RoundTripper <span class="comment">// interface，实现一次http事务，即根据request返回response</span></span><br><span class="line">    CheckRedirect <span class="function"><span class="keyword">func</span><span class="params">(req *Request, via []*Request)</span> <span class="title">error</span> //检查重定向</span></span><br><span class="line">    Jar CookieJar <span class="comment">//cookie</span></span><br><span class="line">    Timeout time.Duration <span class="comment">//超时时间，包括连接、重定向以及读取response，0代表永不超时。The timer remains running after Get, Head, Post, or Do return and will interrupt reading of the Response.Body.</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 全局变量，默认httpClient，可用于get/post/put</span></span><br><span class="line"><span class="keyword">var</span> DefaultClient = &amp;Client&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>client.Do(req *Request)</p>
+<p>通用方法，调用者自己构造request，传进来发送</p>
+</li>
+<li><p>client.Get(url string)</p>
+<p>client.Do()基础上的一层封装，根据参数构造Get request，再调用Do()</p>
+</li>
+<li><p>client.Post(url, contentType string, body io.Reader)</p>
+<p>client.Do()基础上的一层封装，根据参数构造Post request，再调用Do()</p>
+</li>
+<li><p>client.PostFrom(url string, data url.Values)</p>
+<p>client.Post()基础上的一层封装，调用Post()</p>
+</li>
+<li><p>client.Head(url string)</p>
+<p>client.Head()基础上的一层封装，根据参数构造Head request，再调用Do()</p>
+</li>
+</ul>
+<p>可直接调用的方法，都是调用defaultClient的相应方法</p>
+<p>http.Get()–&gt;http.DefaultClient.Get()</p>
+<p>http.Post()–&gt;http.DefaultClient.Post()</p>
+<p>http.PostFrom()–&gt;http.DefaultClient.PostFrom()</p>
+<p>http.Head()–&gt;http.DefaultClient.Head()</p>
+<p>TODO：</p>
+<p>PostForm是什么意思？</p>
+<p>关于tls，比如证书，比如加密套件默认值是怎样的？</p>
+<h1 id="1-middleware"><a href="#1-middleware" class="headerlink" title="1. middleware"></a>1. middleware</h1><p><a target="_blank" rel="noopener" href="https://www.alexedwards.net/blog/making-and-using-middleware">https://www.alexedwards.net/blog/making-and-using-middleware</a></p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">exampleMiddleware</span><span class="params">(next http.Handler)</span> <span class="title">http</span>.<span class="title">Handler</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> http.HandlerFunc(<span class="function"><span class="keyword">func</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">		<span class="comment">// Our middleware logic goes here...</span></span><br><span class="line">        <span class="comment">// 如果想要继续处理就执行以下，否则可直接return</span></span><br><span class="line">		next.ServeHTTP(w, r)</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 
@@ -321,6 +366,10 @@
  </div>
 
     <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/GO/" rel="tag"># GO</a>
+              <a href="/tags/HTTP/" rel="tag"># HTTP</a>
+          </div>
 
         
 
