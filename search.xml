@@ -1124,4 +1124,104 @@
         <tag>NETWORK</tag>
       </tags>
   </entry>
+  <entry>
+    <title>OpenStack</title>
+    <url>/2023/02/24/OpenStack/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>linux文件系统</title>
+    <url>/2023/01/09/linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/</url>
+    <content><![CDATA[<p>来自<a href="https://www.sohu.com/a/413291356_115128">https://www.sohu.com/a/413291356_115128</a></p>
+<h1 id="1-基本组成"><a href="#1-基本组成" class="headerlink" title="1. 基本组成"></a>1. 基本组成</h1><p>每个文件包括两个数据结构：索引节点（inode）以及目录项，前者记录文件的元信息（注意不包括文件名称），后者记录文件的目录层次结构</p>
+<p>inode记录的信息包括：</p>
+<ul>
+<li>inode编号</li>
+<li>文件大小</li>
+<li>访问权限</li>
+<li>创建时间</li>
+<li>修改时间</li>
+<li>数据在磁盘中的位置</li>
+<li>等等</li>
+</ul>
+<p>Q:每个文件的inode信息数据结构大小是否固定？ </p>
+<p>inode信息存储在磁盘中，同样占据磁盘空间</p>
+<p>目录项记录的信息包括：</p>
+<ul>
+<li>文件名称</li>
+<li>inode指针节点</li>
+<li>与其他目录项的层级关系</li>
+</ul>
+<p>目录项是由内核维护的数据结果，并不存储的磁盘中，那么这么来讲假如断电，目录项就会消失？但实际上并不会，所以还是有持久化保存的？No,由目录文件推算得出目录结构</p>
+<p>目录也是文件，也是用索引节点唯一标识，存储目录或者子文件信息，那么这样子就是说在开机时，内核会读取文件系统中的各inode信息，组合成目录结构？</p>
+<p>目录文件和目录项区别？前者持久化存储，后者内存中维护的数据结构</p>
+<p><img src="linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%5C%E7%9B%AE%E5%BD%95%E9%A1%B9.png" alt="目录项"></p>
+<p>磁盘在被格式化时，会被分成三个区域：</p>
+<ul>
+<li><p>超级块</p>
+<p>文件系统详细信息，如块个数、块大小、空闲块等</p>
+</li>
+<li><p>索引节点区</p>
+<p>索引节点信息</p>
+</li>
+<li><p>数据块区</p>
+<p>文件</p>
+</li>
+</ul>
+<p>不能将超级块区以及文件索引区全部加载到内存，内存顶不住，因此：</p>
+<p>超级块：当文件系统挂载时进入内存</p>
+<p>索引节点区：文件被访问时进入内存</p>
+<h1 id="2-虚拟文件系统"><a href="#2-虚拟文件系统" class="headerlink" title="2.虚拟文件系统"></a>2.虚拟文件系统</h1><p>由于文件系统类型众多，OS需要对用户提供一个统一接口，在用户层与文件系统层加入中间层，这个中间层就是虚拟文件系统（VFS）</p>
+<p>VFS定义了一组所有文件系统都支持的数据结构和标准接口</p>
+<p><img src="linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%5CVFS%E6%9E%B6%E6%9E%84.png" alt="VFS架构"></p>
+<p>文件系统总共可分为三类：</p>
+<ul>
+<li><p>磁盘文件系统</p>
+<p>数据存储在磁盘中，比如Ext/2/3/4、XFS等</p>
+</li>
+<li><p>内存文件系统</p>
+<p>数据存储在内存中，如/proc、/sys</p>
+</li>
+<li><p>网络文件系统</p>
+<p>用来访问其他主机数据的文件系统，如NFS、SMB等</p>
+</li>
+</ul>
+<p>文件系统要挂载在某个目录才可正常使用</p>
+<h1 id="3-文件的使用"><a href="#3-文件的使用" class="headerlink" title="3.文件的使用"></a>3.文件的使用</h1><p>每个进程都会维护一个打开文件表，打开文件表由一个个文件描述符组成。</p>
+<p>文件表的具体内容？</p>
+<p>文件描述符的内容？</p>
+<h1 id="4-文件的存储"><a href="#4-文件的存储" class="headerlink" title="4.文件的存储"></a>4.文件的存储</h1><h2 id="4-1-连续空间存储"><a href="#4-1-连续空间存储" class="headerlink" title="4.1 连续空间存储"></a>4.1 连续空间存储</h2><h2 id="4-2-非连续空间存储"><a href="#4-2-非连续空间存储" class="headerlink" title="4.2 非连续空间存储"></a>4.2 非连续空间存储</h2><p>链表方式</p>
+<p>索引方式</p>
+<h1 id="5-文件IO"><a href="#5-文件IO" class="headerlink" title="5.文件IO"></a>5.文件IO</h1><ul>
+<li>缓冲与非缓冲IO</li>
+<li>直接与非直接IO</li>
+</ul>
+<p>内核为了减少磁盘IO次数，在系统调用后会把用户数据拷贝到内核中缓存起来，这个内核缓存空间就是<strong>页缓存</strong></p>
+<p>直接IO：不发生内核缓存和用户程序之间数据复制，而是直接经过文件系统访问磁盘</p>
+<p>非直接IO：读操作时，数据从内核缓存中拷贝给用户程序；写操作时，数据从用户程序拷贝到内核缓存，由内核决定什么时候写入磁盘</p>
+<p>如果在使用文件操作类的系统调用时，指定O_DIRECT标志，则表示使用直接IO，否则默认使用非直接IO</p>
+<p>如果使用非直接IO，那么数据什么时候从缓存写入磁盘？</p>
+<p>①调用write之后，若内核缓存数据太多时</p>
+<p>②用户主动调用sync</p>
+<p>③内存紧张，无法再分配页面</p>
+<p>④内核缓存的数据的缓存时间超过某个时间时</p>
+<ul>
+<li>阻塞与非阻塞IO  同步与异步IO</li>
+</ul>
+<h1 id="6-linux命令"><a href="#6-linux命令" class="headerlink" title="6.linux命令"></a>6.linux命令</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">df</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>statfs</code>系统调用，直接读取分区的超级块信息获取分区使用情况，数据基于分区元数据，因此只能针对整个分区</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">du</span><br></pre></td></tr></table></figure>
+
+<p>对统计的文件诸葛调用<code>fstat</code>系统调用，获取文件大小，数据是基于文件获取，可以跨多个分区操作</p>
+<p>所以可能存在目录中文件被删除，但文件仍被进程占用的场景，此时df显示磁盘占用较多，但du显示无大量文件占用</p>
+<p>也就是说， 用户删除文件后，在文件系统目录中已经不可见了，所以du就不会再统计它。然而如果此时还有运行的进程持有这个已经被删除的文件句柄，那么这个文件就不会真正在磁盘中被删除，分区超级块中的信息也就不会更改，df仍会统计这个被删除的文件。 </p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">lsof -n |grep deleted</span><br></pre></td></tr></table></figure>
+
+<p>列出所有已删除文件的读写操作，进程kill掉就可以释放文件空间</p>
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
 </search>
